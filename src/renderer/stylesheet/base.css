@@ -1,0 +1,28 @@
+@import './typeface.css';
+@import './search.css';
+
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    color: #000000;
+    fill: #000000;
+}
+
+html,
+body {
+    font-family: 'GeistMono', 'General Sans', 'Sarabun', 'system-ui', 'leelawadee UI', sans-serif;
+    background-color: #f8f8f6;
+}
+
+#titlebar {
+    -webkit-app-region: drag;
+    height: 34px;
+    width: 100%;
+
+    position: absolute;
+    top: 0;
+    left: 0;
+}

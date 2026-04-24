@@ -1,0 +1,148 @@
+.header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 34px;
+    backdrop-filter: blur(20px);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 0px;
+    z-index: 10000;
+    background-color: #ffffff;
+    -webkit-app-region: drag;
+}
+
+.back-btn {
+    width: 34px;
+    height: 34px;
+    border: 1px solid transparent;
+    background-color: transparent;
+    backdrop-filter: blur(20px);
+    cursor: pointer;
+    border-radius: 100vmax;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    -webkit-app-region: no-drag;
+}
+
+.back-btn svg {
+    transform: translate(3px, 0px) scale(75%);
+}
+
+.menu-wrapper {
+    position: relative;
+    display: flex;
+    justify-content: flex-end;
+}
+
+html.platform-windows .menu-wrapper {
+    transform: translateX(-136px);
+}
+
+.menu-btn {
+    width: 34px;
+    height: 34px;
+    border: 1px solid transparent;
+    backdrop-filter: blur(20px);
+    cursor: pointer;
+    background-color: transparent;
+    -webkit-app-region: no-drag;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    transition: all 0.15s ease;
+}
+
+.menu-btn:hover {
+    background-color: #e3e3e3;
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+.menu-btn:active {
+    background-color: #e3e3e3;
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+.menu-btn:focus {
+    outline: none;
+    background-color: #e3e3e3;
+}
+
+.menu-btn svg {
+    transform: translateY(1.5px) scale(85%);
+}
+
+.platforms {
+    position: absolute;
+    top: 36px;
+    right: 0px;
+    display: flex;
+    flex-direction: column;
+    background: rgb(248, 248, 248);
+    outline: solid 1px #e4e4e4;
+    outline-offset: -1px;
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06),
+        0 2px 8px rgba(0, 0, 0, 0.08),
+        0 16px 48px rgba(0, 0, 0, 0.10),
+        0 48px 120px rgba(0, 0, 0, 0.14);
+    min-width: 150px;
+    border-radius: 4px;
+    z-index: 1001;
+}
+
+.platforms button {
+    padding: 13px 12px;
+    line-height: 0;
+    font-family: 'Switzer';
+    border: none;
+    text-align: left;
+    cursor: pointer;
+    background: rgb(255, 255, 255);
+    font-size: 14px;
+}
+
+.platforms button:hover {
+    background: #007aff;
+    color: #fff;
+}
+
+.hidden {
+    display: none;
+}
+
+#resultFrame {
+    position: fixed;
+    /* top: 34px; */
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: calc(100vh - 34px) !important;
+    border: none;
+}
+
+.search-title {
+    flex: 1;
+    text-align: center;
+    font-size: 13.5px;
+    color: #000000;
+    font-family: 'General Sans', 'Sarabun', 'system-ui', 'leelawadee UI', sans-serif;
+    font-weight: 500;
+    letter-spacing: -0.2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 250px;
+    margin: 0 auto;
+
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    -webkit-app-region: drag;
+}

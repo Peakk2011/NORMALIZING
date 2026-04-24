@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Normalizing</title>
+    <link rel="stylesheet" href="/src/renderer/stylesheet/base.css">
+    <link rel="stylesheet" href="/src/visualizer/visualizer.css">
+</head>
+
+<body>
+
+    <div id="titlebar"></div>
+
+    <div class="container">
+        <h1 class="title">NORMALIZING</h1>
+
+        <div class="flex-search-box">
+            <textarea id="queryInput" rows="1" placeholder="Type here to search..." autocomplete="off"></textarea>
+
+            <div class="menu-wrapper">
+                <button class="menu-btn" id="menuBtn">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px"
+                        fill="currentcolor">
+                        <path
+                            d="M480-160q-33 0-56.5-23.5T400-240q0-33 23.5-56.5T480-320q33 0 56.5 23.5T560-240q0 33-23.5 56.5T480-160Zm0-240q-33 0-56.5-23.5T400-480q0-33 23.5-56.5T480-560q33 0 56.5 23.5T560-480q0 33-23.5 56.5T480-400Zm0-240q-33 0-56.5-23.5T400-720q0-33 23.5-56.5T480-800q33 0 56.5 23.5T560-720q0 33-23.5 56.5T480-640Z" />
+                    </svg>
+                </button>
+
+                <div class="platforms hidden" id="platformMenu">
+                    <button class="google" data-platform="google" style="border-top-right-radius: 4px; border-top-left-radius: 4px;">Google</button>
+                    <button class="youtube" data-platform="youtube">YouTube</button>
+                    <button class="threads" data-platform="threads">Threads</button>
+                    <button class="instagram" data-platform="instagram">Instagram</button>
+                    <button class="facebook" data-platform="facebook">Facebook</button>
+                    <button class="github" data-platform="github">GitHub</button>
+                    <button class="pinterest" data-platform="pinterest" style="border-bottom-right-radius: 4px; border-bottom-left-radius: 4px;">Pinterest</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <p class="search-hint">
+        Type your message and select your platform.
+    </p>
+
+    <script type="module" src="/src/renderer/app.ts"></script>
+</body>
+
+</html>
