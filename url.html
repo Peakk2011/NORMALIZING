@@ -43,7 +43,16 @@
         </div>
     </div>
 
-    <webview id="resultFrame" src="" partition="persist:search" style="width: 100%; height: 100%;"></webview>
+    <webview id="resultFrame" src="" partition="persist:search"></webview>
+
+    <div id="webFallback" class="web-fallback hidden">
+        <h2>Cannot Display Content in Browser</h2>
+        <p id="fallbackMessage">
+            This page cannot be embedded in a browser due to security restrictions.
+            Click the button below to open the result in a new tab.
+        </p>
+        <button id="openInNewTab">Open in New Tab</button>
+    </div>
 
     <script type="module" src="/src/renderer/url.ts"></script>
 </body>

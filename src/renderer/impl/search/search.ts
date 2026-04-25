@@ -10,6 +10,20 @@ declare global {
             openExternal: (url: string) => void;
             openUrlHtml: (platform: string, query: string) => void;
         };
+        env?: {
+            platform: string;
+            runtime: string;
+            isElectron: boolean;
+            isWeb: boolean;
+            isDev: boolean;
+        };
+        __normalizingEnv?: {
+            platform: string;
+            runtime: string;
+            isElectron: boolean;
+            isWeb: boolean;
+            isDev: boolean;
+        };
     }
 }
 
@@ -23,9 +37,18 @@ const search = (platform: Platform): void => {
         return;
     }
 
-    // Navigate to url.html with platform and query
-    const urlHtmlUrl = `${window.location.origin}/url.html?platform=${encodeURIComponent(platform)}&query=${encodeURIComponent(query)}`;
-    window.location.href = urlHtmlUrl;
+    const url = mkReqUrl(platform, query);
+    if (!url) return;
+
+    const env = (window.env as any) ?? (window as any).__normalizingEnv;
+    if (env?.isWeb) {
+        // Direct redirect for web browsers
+        window.location.href = url;
+    } else {
+        // Navigate to url.html for Electron
+        const urlHtmlUrl = `${window.location.origin}/url.html?platform=${encodeURIComponent(platform)}&query=${encodeURIComponent(query)}`;
+        window.location.href = urlHtmlUrl;
+    }
 };
 
 export default search

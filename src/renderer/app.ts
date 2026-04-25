@@ -27,13 +27,47 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Inject platform classes
     const root = document.documentElement;
-    const env = window.env;
-    if (env) {
-        root.classList.add(`platform-${env.platform}`);
-        root.classList.add(`runtime-${env.runtime}`);
-        if (env.isDev) root.classList.add("env-dev");
-        else root.classList.add("env-prod");
-    }
+    
+    const env = (window as any).env ?? (window as any).__normalizingEnv ?? {
+        platform: navigator.userAgent.toLowerCase().includes("win") ? "windows"
+                : navigator.userAgent.toLowerCase().includes("mac") ? "mac"
+                : navigator.userAgent.toLowerCase().includes("linux") ? "linux"
+                : "unknown",
+        runtime: "web",
+        isElectron: false,
+        isWeb: true,
+        isDev: location.hostname === "localhost" || location.hostname === "127.0.0.1",
+    };
+
+    const setWindowEnv = (value: typeof env) => {
+        const desc = Object.getOwnPropertyDescriptor(window, 'env');
+        if (!desc || desc.writable) {
+            try {
+                window.env = value;
+                return;
+            } catch {
+                // fallback below
+            }
+        }
+        if (desc?.configurable) {
+            Object.defineProperty(window, 'env', {
+                value,
+                writable: true,
+                configurable: true,
+                enumerable: true,
+            });
+            return;
+        }
+        (window as any).__normalizingEnv = value;
+    };
+
+    setWindowEnv(env);
+
+    root.classList.add(`platform-${env.platform}`);
+    root.classList.add(`runtime-${env.runtime}`);
+    root.classList.add(env.isDev ? "env-dev" : "env-prod");
+
+    console.log('window.env:', window.env);
 
     void normalize;
 

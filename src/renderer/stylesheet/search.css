@@ -1,9 +1,9 @@
 .container {
-    width: 280px;
+    width: clamp(280px, 50vw, 350px);
     margin: auto;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 28px;
     position: absolute;
     top: 45%;
     left: 50%;
@@ -11,12 +11,19 @@
 }
 
 /* title scoped */
-.container .title {
+/* .container .title {
     margin: 0;
     text-align: center;
     font-weight: 580;
     letter-spacing: -0.6px;
     font-size: 26px;
+} */
+
+.container .title {
+    width: 260px;
+    height: auto;
+    object-fit: contain;
+    margin: 0 auto;
 }
 
 /* Search box */

@@ -12,17 +12,47 @@ declare global {
     }
 }
 
-// Detect platform and add CSS classes
 const ua = navigator.userAgent.toLowerCase();
-const isMac = ua.includes("mac");
+const isMac     = ua.includes("mac");
 const isWindows = ua.includes("win");
-const isLinux = ua.includes("linux");
-const platform = isMac ? "mac" : isWindows ? "windows" : isLinux ? "linux" : "unknown";
-const isDev = location.hostname === "localhost" || location.hostname === "127.0.0.1";
+const isLinux   = ua.includes("linux");
+const isElectron = ua.includes("electron");
 
-document.documentElement.classList.add(`platform-${platform}`);
-document.documentElement.classList.add(`runtime-electron`);
-document.documentElement.classList.add(isDev ? "env-dev" : "env-prod");
+const env = (window as any).env ?? (window as any).__normalizingEnv ?? {
+    platform:   isMac ? "mac" : isWindows ? "windows" : isLinux ? "linux" : "unknown",
+    runtime:    isElectron ? "electron" : "web",
+    isElectron: isElectron,
+    isWeb:      !isElectron,
+    isDev:      location.hostname === "localhost" || location.hostname === "127.0.0.1",
+};
+
+const setWindowEnv = (value: typeof env) => {
+    const desc = Object.getOwnPropertyDescriptor(window, 'env');
+    if (!desc || desc.writable) {
+        try {
+            window.env = value;
+            return;
+        } catch {
+            // fallback below
+        }
+    }
+    if (desc?.configurable) {
+        Object.defineProperty(window, 'env', {
+            value,
+            writable: true,
+            configurable: true,
+            enumerable: true,
+        });
+        return;
+    }
+    (window as any).__normalizingEnv = value;
+};
+
+setWindowEnv(env);
+
+document.documentElement.classList.add(`platform-${env.platform}`);
+document.documentElement.classList.add(`runtime-${env.runtime}`);
+document.documentElement.classList.add(env.isDev ? "env-dev" : "env-prod");
 
 interface SearchData {
     platform: Platform;
@@ -60,16 +90,19 @@ const openUrl = (url: string): void => {
 };
 
 const loadResult = (url: string): void => {
-    const webview = document.getElementById('resultFrame') as Electron.WebviewTag | null;
-    if (!webview) {
-        console.error('Webview element not found');
-        openUrl(url); // Fallback
+    if (env.isWeb) {
+        window.location.href = url;
         return;
     }
 
-    webview.addEventListener('did-fail-load', (e: any) => {
-        console.error('Failed to load URL in webview:', e.errorDescription);
-        openUrl(url); // Fallback
+    const webview = document.getElementById('resultFrame') as Electron.WebviewTag | null;
+    if (!webview) {
+        openUrl(url);
+        return;
+    }
+
+    webview.addEventListener('did-fail-load', () => {
+        openUrl(url);
     });
 
     webview.src = url;
@@ -98,7 +131,7 @@ const initHeader = (): void => {
 };
 
 const initMenu = (): void => {
-    const menuBtn = document.getElementById('menuBtn');
+    const menuBtn      = document.getElementById('menuBtn');
     const platformMenu = document.getElementById('platformMenu');
 
     if (!menuBtn || !platformMenu) return;
@@ -140,10 +173,7 @@ const initMenu = (): void => {
 document.addEventListener('DOMContentLoaded', () => {
     currentData = parseSearchData();
 
-    if (!currentData) {
-        console.warn('No search data found in URL params');
-        return;
-    }
+    if (!currentData) return;
 
     loadResult(currentData.url);
 
