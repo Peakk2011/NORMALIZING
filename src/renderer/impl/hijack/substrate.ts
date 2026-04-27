@@ -1,4 +1,3 @@
-import doSearch from '../search/search.js';
 import { closeMenu } from '../io/menu.js';
 
 const initSubstrate = (): void => {
@@ -9,12 +8,6 @@ const initSubstrate = (): void => {
         if (e.key === 'Escape') {
             closeMenu();
             return;
-        }
-        if (e.key === 'Enter') {
-            if (e.ctrlKey || e.metaKey) return;
-            e.preventDefault();
-            doSearch('google');
-            closeMenu();
         }
     });
 };

@@ -4,6 +4,7 @@
         // File Layout
         "rootDir": "./src",
         "outDir": "./dist",
+        "baseUrl": ".",
         // Environment Settings
         // See also https://aka.ms/tsconfig/module
         "module": "nodenext",
@@ -14,6 +15,13 @@
         "types": [
             "node"
         ],
+        "paths": {
+            "@app/preload": ["src/preload/p0_init.ts"],
+            "@app/*": ["src/core/app/*"],
+            "@core/*": ["src/core/*"],
+            "@renderer/*": ["src/renderer/*"],
+            "@visualizer/*": ["src/visualizer/*"]
+        },
         // and npm install -D @types/node
         // Other Outputs
         "sourceMap": true,
@@ -31,6 +39,7 @@
         // "noPropertyAccessFromIndexSignature": true,
         // Recommended Options
         "strict": true,
+        "ignoreDeprecations": "6.0",
         "jsx": "react-jsx",
         "verbatimModuleSyntax": true,
         "isolatedModules": true,

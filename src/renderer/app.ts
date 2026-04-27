@@ -4,31 +4,19 @@ import normalize from './normalize.js';
 import initMenu from './impl/io/menu.js';
 import initInput from './impl/io/input.js';
 import initBtn from './impl/io/btn.js';
+import initSidebar from './impl/io/sidebar.js';
 import initSubstrate from './impl/hijack/substrate.js';
-
-declare global {
-    interface Window {
-        electronAPI?: {
-            openExternal: (url: string) => void;
-            openUrlHtml: (platform: string, query: string) => void;
-        };
-        env?: {
-            platform: string;
-            runtime: string;
-            isElectron: boolean;
-            isWeb: boolean;
-            isDev: boolean;
-        };
-    }
-}
+import { mountSidebarParts } from './impl/io/sidebar_parts.js';
+import type { NormalizingEnv } from './types/window.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('app.ts loaded, electronAPI:', (window as any).electronAPI);
+    console.log('app.ts loaded, electronAPI:', window.electronAPI);
+    mountSidebarParts();
 
     // Inject platform classes
     const root = document.documentElement;
     
-    const env = (window as any).env ?? (window as any).__normalizingEnv ?? {
+    const env: NormalizingEnv = window.env ?? window.__normalizingEnv ?? {
         platform: navigator.userAgent.toLowerCase().includes("win") ? "windows"
                 : navigator.userAgent.toLowerCase().includes("mac") ? "mac"
                 : navigator.userAgent.toLowerCase().includes("linux") ? "linux"
@@ -58,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             return;
         }
-        (window as any).__normalizingEnv = value;
+        window.__normalizingEnv = value;
     };
 
     setWindowEnv(env);
@@ -74,5 +62,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initMenu();
     initInput();
     initBtn();
+    initSidebar();
     initSubstrate();
 });

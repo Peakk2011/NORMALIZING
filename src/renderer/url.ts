@@ -2,15 +2,9 @@
 
 import type { Platform } from './impl/data/usrspace.js';
 import mkReqUrl from './impl/search/mk_req_url.js';
-
-declare global {
-    interface Window {
-        electronAPI?: {
-            openExternal: (url: string) => void;
-            openUrlHtml: (platform: string, query: string) => void;
-        };
-    }
-}
+import initSidebar from './impl/io/sidebar.js';
+import { mountSidebarParts } from './impl/io/sidebar_parts.js';
+import type { NormalizingEnv } from './types/window.js';
 
 const ua = navigator.userAgent.toLowerCase();
 const isMac     = ua.includes("mac");
@@ -18,7 +12,7 @@ const isWindows = ua.includes("win");
 const isLinux   = ua.includes("linux");
 const isElectron = ua.includes("electron");
 
-const env = (window as any).env ?? (window as any).__normalizingEnv ?? {
+const env: NormalizingEnv = window.env ?? window.__normalizingEnv ?? {
     platform:   isMac ? "mac" : isWindows ? "windows" : isLinux ? "linux" : "unknown",
     runtime:    isElectron ? "electron" : "web",
     isElectron: isElectron,
@@ -45,7 +39,7 @@ const setWindowEnv = (value: typeof env) => {
         });
         return;
     }
-    (window as any).__normalizingEnv = value;
+    window.__normalizingEnv = value;
 };
 
 setWindowEnv(env);
@@ -55,7 +49,7 @@ document.documentElement.classList.add(`runtime-${env.runtime}`);
 document.documentElement.classList.add(env.isDev ? "env-dev" : "env-prod");
 
 interface SearchData {
-    platform: Platform;
+    platform: Platform | null;
     query: string;
     url: string;
 }
@@ -72,6 +66,12 @@ const parseSearchData = (): SearchData | null => {
     const params = new URLSearchParams(window.location.search);
     const platformParam = params.get('platform');
     const query = params.get('query');
+    const target = params.get('target');
+
+    if (target) {
+        const url = makeHref(target);
+        return { platform: null, query: query ?? target, url };
+    }
 
     if (!platformParam || !query || !isValidPlatform(platformParam)) return null;
 
@@ -109,11 +109,33 @@ const loadResult = (url: string): void => {
 };
 
 const goBack = (): void => {
+    if (env.isWeb) {
+        if (window.history.length > 1) {
+            window.history.back();
+            return;
+        }
+        window.location.href = 'index.html';
+        return;
+    }
+
+    const webview = document.getElementById('resultFrame') as Electron.WebviewTag | null;
+    if (webview?.canGoBack()) {
+        webview.goBack();
+        return;
+    }
+
     window.location.href = 'index.html';
 };
 
 const searchAgain = (platform: Platform): void => {
     if (!currentData) return;
+
+    if (isLikelyUrl(currentData.query)) {
+        const url = makeHref(currentData.query);
+        loadResult(url);
+        currentData = { ...currentData, platform: null, url };
+        return;
+    }
 
     const url = mkReqUrl(platform, currentData.query);
     if (url) {
@@ -122,12 +144,65 @@ const searchAgain = (platform: Platform): void => {
     }
 };
 
-const initHeader = (): void => {
-    const searchTitle = document.getElementById('searchTitle');
-    if (searchTitle && currentData) {
-        searchTitle.textContent = currentData.query;
-        searchTitle.title = currentData.query;
+const isLikelyUrl = (value: string): boolean => {
+    const trimmed = value.trim();
+    if (!trimmed) return false;
+
+    const schemePattern = /^[a-z][a-z\d+\-.]*:\/\//i;
+    const hostPattern = /^(?:[\w-]+\.)+[a-z]{2,}(?:[:/].*)?$/i;
+    return schemePattern.test(trimmed) || hostPattern.test(trimmed);
+};
+
+const makeHref = (value: string): string => {
+    const trimmed = value.trim();
+    if (/^[a-z][a-z\d+\-.]*:\/\//i.test(trimmed)) {
+        return trimmed;
     }
+    if (/^\/\//.test(trimmed)) {
+        return `https:${trimmed}`;
+    }
+    return `https://${trimmed}`;
+};
+
+const initHeader = (): void => {
+    const searchTitle = document.getElementById('searchTitle') as HTMLInputElement | null;
+    if (!searchTitle || !currentData) return;
+
+    searchTitle.value = currentData.query;
+    searchTitle.title = currentData.query;
+
+    const updateUrlStyle = (): void => {
+        if (isLikelyUrl(searchTitle.value)) {
+            searchTitle.classList.add('url-detected');
+        } else {
+            searchTitle.classList.remove('url-detected');
+        }
+    };
+
+    const performSearch = (): void => {
+        const query = searchTitle.value.trim();
+        if (!query || !currentData) return;
+
+        currentData = { ...currentData, query };
+        const directUrl = isLikelyUrl(query);
+        const nextPlatform = directUrl ? null : (currentData.platform ?? 'google');
+        const url = directUrl
+            ? makeHref(query)
+            : mkReqUrl(nextPlatform as Platform, query);
+        if (url) {
+            currentData = { ...currentData, platform: nextPlatform, url };
+            loadResult(url);
+            searchTitle.title = query;
+        }
+    };
+
+    searchTitle.addEventListener('input', updateUrlStyle);
+    searchTitle.addEventListener('keydown', (event: KeyboardEvent) => {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            performSearch();
+        }
+    });
 };
 
 const initMenu = (): void => {
@@ -171,6 +246,8 @@ const initMenu = (): void => {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
+    mountSidebarParts();
+    initSidebar();
     currentData = parseSearchData();
 
     if (!currentData) return;

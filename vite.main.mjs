@@ -4,7 +4,6 @@ import { defineConfig } from "vite";
 const rootDir = path.resolve(process.cwd(), "src");
 
 const alias = {
-  "@app/preload": path.resolve(rootDir, "preload/p0_init.ts"),
   "@app": path.resolve(rootDir, "core/app"),
   "@core": path.resolve(rootDir, "core"),
   "@renderer": path.resolve(rootDir, "renderer"),
@@ -17,14 +16,17 @@ export default defineConfig({
   },
   build: {
     lib: {
-      entry: "src/preload.cts",
+      entry: "src/main.ts",
       formats: ["cjs"],
-      fileName: () => "preload.js",
+      fileName: () => "main.cjs",
     },
     outDir: "dist",
     emptyOutDir: false,
     rollupOptions: {
-      external: ["electron"],
+      external: [
+        "electron",
+        /^node:/,
+      ],
     },
   },
 });

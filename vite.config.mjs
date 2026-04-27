@@ -1,6 +1,19 @@
+import path from "node:path";
 import { defineConfig } from "vite";
 
+const rootDir = path.resolve(process.cwd(), "src");
+
+const alias = {
+  "@app": path.resolve(rootDir, "core/app"),
+  "@core": path.resolve(rootDir, "core"),
+  "@renderer": path.resolve(rootDir, "renderer"),
+  "@visualizer": path.resolve(rootDir, "visualizer"),
+};
+
 export default defineConfig({
+  resolve: {
+    alias,
+  },
   base: "./",
   server: {
     host: "127.0.0.1",

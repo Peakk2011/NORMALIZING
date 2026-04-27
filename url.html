@@ -10,15 +10,25 @@
 </head>
 
 <body>
-    <div class="header">
-        <button class="back-btn" id="backBtn">
-            <svg xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 -960 960 960" width="18px"
-                fill="currentcolor">
-                <path d="M400-80 0-480l400-400 71 71-329 329 329 329-71 71Z" />
-            </svg>
-        </button>
 
-        <div class="search-title" id="searchTitle"></div>
+    <div id="sidebarParts"></div>
+
+    <div class="header">
+        <div class="behave-buttons">
+            <button class="back-btn" id="backBtn">
+                <svg xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 -960 960 960" width="18px"
+                    fill="currentcolor">
+                    <path d="M400-80 0-480l400-400 71 71-329 329 329 329-71 71Z" />
+                </svg>
+            </button>
+            <button id="sidebarToggle" class="sidebar-toggle" type="button" aria-label="Open history sidebar">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentcolor">
+                    <path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                </svg>
+            </button>
+        </div>
+
+        <input type="text" id="searchTitle" class="search-title" placeholder="Search or paste URL" autocomplete="off" />
 
         <div class="menu-wrapper">
             <button class="menu-btn" id="menuBtn">
