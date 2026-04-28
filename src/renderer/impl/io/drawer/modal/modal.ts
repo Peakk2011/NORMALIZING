@@ -8,7 +8,11 @@ export const openSearchModal = (modal: HTMLElement, modalQueryInput: HTMLTextAre
         modalQueryInput.value = pageInput.value;
     }
     modal.classList.remove('hidden');
+    modal.classList.remove('is-visible');
     modal.setAttribute('aria-hidden', 'false');
+    window.requestAnimationFrame(() => {
+        modal.classList.add('is-visible');
+    });
     focusModalInput(modalQueryInput);
 };
 
@@ -21,8 +25,13 @@ export const closeSearchModal = (modal: HTMLElement): void => {
             // ignore
         }
     }
-    modal.classList.add('hidden');
     modal.setAttribute('aria-hidden', 'true');
+    modal.classList.remove('is-visible');
+    window.setTimeout(() => {
+        if (modal.getAttribute('aria-hidden') === 'true') {
+            modal.classList.add('hidden');
+        }
+    }, 180);
 };
 
 export const initSearchModal = (
@@ -34,6 +43,10 @@ export const initSearchModal = (
 ): void => {
     const modalFind = modal.querySelector<HTMLButtonElement>('#sidebarSearchFindBtn');
     const modalClear = modal.querySelector<HTMLButtonElement>('#sidebarSearchClearBtn');
+    const isSearchShortcut = (event: KeyboardEvent): boolean => {
+        const hasModifier = event.ctrlKey || event.metaKey;
+        return hasModifier && event.code === 'KeyF' && !event.altKey;
+    };
 
     const runSearch = (): void => {
         const query = modalQueryInput.value.trim();
@@ -70,11 +83,6 @@ export const initSearchModal = (
         closeSearchModal(modal);
     });
 
-    modalQueryInput.addEventListener('input', () => {
-        modalQueryInput.style.height = 'auto';
-        modalQueryInput.style.height = `${Math.min(modalQueryInput.scrollHeight, 160)}px`;
-    });
-
     modalQueryInput.addEventListener('keydown', (event: KeyboardEvent) => {
         if (event.key === 'Enter') {
             event.preventDefault();
@@ -83,6 +91,17 @@ export const initSearchModal = (
         if (event.key === 'Escape') {
             event.preventDefault();
             closeSearchModal(modal);
+        }
+    });
+
+    document.addEventListener('keydown', (event: KeyboardEvent) => {
+        if (isSearchShortcut(event)) {
+            event.preventDefault();
+            if (modal.getAttribute('aria-hidden') === 'false') {
+                closeSearchModal(modal);
+                return;
+            }
+            openSearchModal(modal, modalQueryInput);
         }
     });
 };

@@ -2,9 +2,11 @@
 
 import type { Platform } from './impl/data/usrspace.js';
 import mkReqUrl from './impl/search/mk_req_url.js';
+import { isLikelyUrl, makeHref, recordSearchHistory } from './impl/search/search.js';
 import initSidebar from './impl/io/sidebar.js';
 import { mountSidebarParts } from './impl/io/sidebar_parts.js';
 import type { NormalizingEnv } from './types/window.js';
+import { Visualizer } from '../visualizer/visualizer.js';
 
 const ua = navigator.userAgent.toLowerCase();
 const isMac     = ua.includes("mac");
@@ -62,6 +64,30 @@ function isValidPlatform(platform: string): platform is Platform {
 
 let currentData: SearchData | null = null;
 
+const getUrlErrorMessage = (query: string, detail?: string, errorCode?: number): string => {
+    if (errorCode === -118) {
+        return `Connection timed out while opening:\n${query}`;
+    }
+
+    if (errorCode === -106) {
+        return `No internet connection.\nUnable to open:\n${query}`;
+    }
+
+    if (detail) {
+        return `${query}\n${detail}`;
+    }
+
+    return query;
+};
+
+const showUrlError = async (query: string, detail?: string): Promise<void> => {
+    await Visualizer({
+        title: 'This URL could not be opened.',
+        message: getUrlErrorMessage(query, detail),
+    });
+    window.location.href = 'index.html';
+};
+
 const parseSearchData = (): SearchData | null => {
     const params = new URLSearchParams(window.location.search);
     const platformParam = params.get('platform');
@@ -90,6 +116,13 @@ const openUrl = (url: string): void => {
 };
 
 const loadResult = (url: string): void => {
+    try {
+        new URL(url);
+    } catch {
+        void showUrlError(url, 'The address is invalid.');
+        return;
+    }
+
     if (env.isWeb) {
         window.location.href = url;
         return;
@@ -101,9 +134,21 @@ const loadResult = (url: string): void => {
         return;
     }
 
-    webview.addEventListener('did-fail-load', () => {
-        openUrl(url);
-    });
+    const handleFailLoad = (event: Electron.DidFailLoadEvent): void => {
+        webview.removeEventListener('did-fail-load', handleFailLoad as EventListener);
+        if (event.errorCode === -3) {
+            return;
+        }
+        const label = currentData?.query ?? url;
+        void Visualizer({
+            title: 'This URL could not be opened.',
+            message: getUrlErrorMessage(label, event.errorDescription, event.errorCode),
+        }).then(() => {
+            window.location.href = 'index.html';
+        });
+    };
+
+    webview.addEventListener('did-fail-load', handleFailLoad as EventListener);
 
     webview.src = url;
 };
@@ -132,6 +177,7 @@ const searchAgain = (platform: Platform): void => {
 
     if (isLikelyUrl(currentData.query)) {
         const url = makeHref(currentData.query);
+        recordSearchHistory('direct', currentData.query);
         loadResult(url);
         currentData = { ...currentData, platform: null, url };
         return;
@@ -139,29 +185,10 @@ const searchAgain = (platform: Platform): void => {
 
     const url = mkReqUrl(platform, currentData.query);
     if (url) {
+        recordSearchHistory(platform, currentData.query);
         loadResult(url);
         currentData = { ...currentData, platform, url };
     }
-};
-
-const isLikelyUrl = (value: string): boolean => {
-    const trimmed = value.trim();
-    if (!trimmed) return false;
-
-    const schemePattern = /^[a-z][a-z\d+\-.]*:\/\//i;
-    const hostPattern = /^(?:[\w-]+\.)+[a-z]{2,}(?:[:/].*)?$/i;
-    return schemePattern.test(trimmed) || hostPattern.test(trimmed);
-};
-
-const makeHref = (value: string): string => {
-    const trimmed = value.trim();
-    if (/^[a-z][a-z\d+\-.]*:\/\//i.test(trimmed)) {
-        return trimmed;
-    }
-    if (/^\/\//.test(trimmed)) {
-        return `https:${trimmed}`;
-    }
-    return `https://${trimmed}`;
 };
 
 const initHeader = (): void => {
@@ -190,6 +217,7 @@ const initHeader = (): void => {
             ? makeHref(query)
             : mkReqUrl(nextPlatform as Platform, query);
         if (url) {
+            recordSearchHistory(directUrl ? 'direct' : (nextPlatform as Platform), query);
             currentData = { ...currentData, platform: nextPlatform, url };
             loadResult(url);
             searchTitle.title = query;

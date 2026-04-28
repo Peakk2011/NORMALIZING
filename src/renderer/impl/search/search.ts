@@ -5,14 +5,40 @@ import mkReqUrl from './mk_req_url.js';
 import { Visualizer } from '../../../visualizer/visualizer.js';
 import type { NormalizingEnv } from '../../types/window.js';
 
+export type HistoryPlatform = Platform | 'direct';
+
 export interface HistoryRecord {
-    platform: Platform;
+    platform: HistoryPlatform;
     query: string;
     timestamp: number;
     pinned?: boolean;
 }
 
 const HISTORY_KEY = 'normalizingSearchHistory';
+const ACTIVE_HISTORY_KEY = 'normalizingActiveHistoryItem';
+
+const getHistoryRecordKey = (record: Pick<HistoryRecord, 'platform' | 'query'>): string =>
+    `${record.platform}::${record.query}`;
+
+export const isLikelyUrl = (value: string): boolean => {
+    const trimmed = value.trim();
+    if (!trimmed) return false;
+
+    const schemePattern = /^[a-z][a-z\d+\-.]*:\/\//i;
+    const hostPattern = /^(?:[\w-]+\.)+[a-z]{2,}(?:[:/].*)?$/i;
+    return schemePattern.test(trimmed) || hostPattern.test(trimmed);
+};
+
+export const makeHref = (value: string): string => {
+    const trimmed = value.trim();
+    if (/^[a-z][a-z\d+\-.]*:\/\//i.test(trimmed)) {
+        return trimmed;
+    }
+    if (/^\/\//.test(trimmed)) {
+        return `https:${trimmed}`;
+    }
+    return `https://${trimmed}`;
+};
 
 const isHistoryRecord = (value: unknown): value is HistoryRecord => {
     return Boolean(value
@@ -32,6 +58,29 @@ const saveSearchHistory = (history: HistoryRecord[]): void => {
         // ignore storage errors
     }
 };
+
+export const getActiveSearchHistoryKey = (): string | null => {
+    try {
+        return localStorage.getItem(ACTIVE_HISTORY_KEY);
+    } catch {
+        return null;
+    }
+};
+
+export const setActiveSearchHistory = (record: Pick<HistoryRecord, 'platform' | 'query'> | null): void => {
+    try {
+        if (!record) {
+            localStorage.removeItem(ACTIVE_HISTORY_KEY);
+            return;
+        }
+        localStorage.setItem(ACTIVE_HISTORY_KEY, getHistoryRecordKey(record));
+    } catch {
+        // ignore storage errors
+    }
+};
+
+export const isActiveSearchHistory = (record: Pick<HistoryRecord, 'platform' | 'query'>): boolean =>
+    getActiveSearchHistoryKey() === getHistoryRecordKey(record);
 
 const getQueryInput = (): HTMLTextAreaElement | null => {
     return document.getElementById('queryInput') as HTMLTextAreaElement | null
@@ -60,9 +109,9 @@ export const getSearchHistory = (): HistoryRecord[] => {
     }
 };
 
-const addSearchHistory = (platform: Platform, query: string): void => {
+const addSearchHistory = (platform: HistoryPlatform, query: string): HistoryRecord | null => {
     const trimmedQuery = query.trim();
-    if (!trimmedQuery) return;
+    if (!trimmedQuery) return null;
 
     const history = getSearchHistory();
     const existingIndex = history.findIndex(item => item.platform === platform && item.query === trimmedQuery);
@@ -86,9 +135,21 @@ const addSearchHistory = (platform: Platform, query: string): void => {
     }
 
     saveSearchHistory(history);
+    return nextEntry;
+};
+
+export const recordSearchHistory = (platform: HistoryPlatform, query: string): HistoryRecord | null => {
+    const nextEntry = addSearchHistory(platform, query);
+    if (nextEntry) {
+        setActiveSearchHistory(nextEntry);
+    }
+    return nextEntry;
 };
 
 export const deleteSearchHistory = (record: HistoryRecord): void => {
+    if (isActiveSearchHistory(record)) {
+        setActiveSearchHistory(null);
+    }
     const history = getSearchHistory().filter(item => item.platform !== record.platform || item.query !== record.query);
     saveSearchHistory(history);
 };
@@ -103,6 +164,38 @@ export const toggleSearchHistoryPinned = (record: HistoryRecord): void => {
     saveSearchHistory(history);
 };
 
+export const renameSearchHistory = (record: HistoryRecord, nextQuery: string): HistoryRecord | null => {
+    const trimmedQuery = nextQuery.trim();
+    if (!trimmedQuery) return null;
+
+    const history = getSearchHistory();
+    const targetIndex = history.findIndex(item => item.platform === record.platform && item.query === record.query);
+    if (targetIndex === -1) return null;
+
+    const target = history[targetIndex]!;
+    const duplicateIndex = history.findIndex((item, index) =>
+        index !== targetIndex && item.platform === record.platform && item.query === trimmedQuery);
+
+    if (duplicateIndex !== -1) {
+        history.splice(duplicateIndex, 1);
+    }
+
+    const renamedRecord: HistoryRecord = {
+        ...target,
+        query: trimmedQuery,
+        timestamp: Date.now(),
+    };
+
+    history[targetIndex] = renamedRecord;
+    saveSearchHistory(history);
+
+    if (isActiveSearchHistory(record)) {
+        setActiveSearchHistory(renamedRecord);
+    }
+
+    return renamedRecord;
+};
+
 const search = (platform: Platform, queryOverride?: string): void => {
     const input = getQueryInput();
     const query = (queryOverride?.trim() ?? input?.value?.trim() ?? '').trim();
@@ -111,18 +204,20 @@ const search = (platform: Platform, queryOverride?: string): void => {
         return;
     }
 
-    const url = mkReqUrl(platform, query);
+    const directUrl = isLikelyUrl(query);
+    const historyPlatform: HistoryPlatform = directUrl ? 'direct' : platform;
+    const url = directUrl ? makeHref(query) : mkReqUrl(platform, query);
     if (!url) return;
 
-    addSearchHistory(platform, query);
+    recordSearchHistory(historyPlatform, query);
 
     const env: NormalizingEnv | undefined = window.env ?? window.__normalizingEnv;
     if (env?.isWeb) {
-        // Direct redirect for web browsers
         window.location.href = url;
     } else {
-        // Navigate to url.html for Electron
-        const urlHtmlUrl = `${window.location.origin}/url.html?platform=${encodeURIComponent(platform)}&query=${encodeURIComponent(query)}`;
+        const urlHtmlUrl = directUrl
+            ? `${window.location.origin}/url.html?target=${encodeURIComponent(query)}&query=${encodeURIComponent(query)}`
+            : `${window.location.origin}/url.html?platform=${encodeURIComponent(platform)}&query=${encodeURIComponent(query)}`;
         window.location.href = urlHtmlUrl;
     }
 };

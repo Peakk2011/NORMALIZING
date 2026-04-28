@@ -2,6 +2,7 @@ import { openSidebar, closeSidebar, toggleSidebar } from './dom.js';
 import { openSearchModal, closeSearchModal, initSearchModal } from '../modal/modal.js';
 import { clearSearchInput } from '../modal/dom.js';
 import { renderHistory } from '../history/history.js';
+import { setActiveSearchHistory } from '../../../search/search.js';
 
 const isUrlPage = window.location.pathname.includes('url.html');
 
@@ -31,16 +32,16 @@ const initSidebar = (): void => {
     const { sidebarToggle, sidebar, sidebarClose, searchBtn, newBtn, historyList, modal, modalClose, modalQueryInput } = els;
     const modalOverlay = modal.querySelector('[data-close="true"]') as HTMLElement | null;
 
-    let openMenu: HTMLElement | null = null;
+    const menuState = { current: null as HTMLElement | null };
 
     const closeOpenMenu = (): void => {
-        if (openMenu) {
-            openMenu.classList.add('hidden');
-            openMenu = null;
+        if (menuState.current) {
+            menuState.current.classList.add('hidden');
+            menuState.current = null;
         }
     };
 
-    const refresh = (): void => renderHistory(historyList, sidebar, openMenu, closeOpenMenu, refresh);
+    const refresh = (): void => renderHistory(historyList, sidebar, menuState, closeOpenMenu, refresh);
 
     sidebarToggle.addEventListener('click', (event: MouseEvent) => {
         event.stopPropagation();
@@ -57,24 +58,30 @@ const initSidebar = (): void => {
     });
 
     newBtn.addEventListener('click', () => {
+        setActiveSearchHistory(null);
+        closeSidebar(sidebar);
         if (isUrlPage) {
-            window.location.href = 'index.html';
+            window.setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 220);
             return;
         }
         clearSearchInput(modalQueryInput);
         closeSearchModal(modal);
-        closeSidebar(sidebar);
     });
 
     document.addEventListener('click', (event: MouseEvent) => {
         const target = event.target as Node | null;
         if (!target) return;
+        if (target instanceof Element && target.closest('.vz-overlay')) {
+            return;
+        }
 
         if (!sidebar.contains(target) && !sidebarToggle.contains(target)) {
             closeSidebar(sidebar);
         }
 
-        if (openMenu && !openMenu.contains(target)) {
+        if (menuState.current && !menuState.current.contains(target)) {
             closeOpenMenu();
         }
     });

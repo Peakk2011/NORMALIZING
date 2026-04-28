@@ -1,37 +1,7 @@
-import doSearch from '../search/search.js';
-import type { NormalizingEnv } from '../../types/window.js';
-
-const isLikelyUrl = (value: string): boolean => {
-    const trimmed = value.trim();
-    if (!trimmed) return false;
-
-    const schemePattern = /^[a-z][a-z\d+\-.]*:\/\//i;
-    const hostPattern = /^(?:[\w-]+\.)+[a-z]{2,}(?:[:/].*)?$/i;
-    return schemePattern.test(trimmed) || hostPattern.test(trimmed);
-};
-
-const makeHref = (value: string): string => {
-    const trimmed = value.trim();
-    if (/^[a-z][a-z\d+\-.]*:\/\//i.test(trimmed)) {
-        return trimmed;
-    }
-    if (/^\/\//.test(trimmed)) {
-        return `https:${trimmed}`;
-    }
-    return `https://${trimmed}`;
-};
+import doSearch, { isLikelyUrl } from '../search/search.js';
 
 const navigateToDirectUrl = (query: string): void => {
-    const href = makeHref(query);
-    const env: NormalizingEnv | undefined = window.env ?? window.__normalizingEnv;
-
-    if (env?.isWeb) {
-        window.location.href = href;
-        return;
-    }
-
-    const urlHtmlUrl = `${window.location.origin}/url.html?target=${encodeURIComponent(query)}&query=${encodeURIComponent(query)}`;
-    window.location.href = urlHtmlUrl;
+    doSearch('google', query);
 };
 
 const initInput = (): void => {

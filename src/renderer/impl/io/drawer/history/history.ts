@@ -1,18 +1,28 @@
-import { getSearchHistory } from '../../../search/search.js';
+import { getActiveSearchHistoryKey, getSearchHistory } from '../../../search/search.js';
 import { createHistoryItem } from './item.js';
 import type { RefreshFn } from './types.js';
+
+export interface HistoryMenuState {
+    current: HTMLElement | null;
+}
 
 export const renderHistory = (
     historyList: HTMLElement,
     sidebar: HTMLElement,
-    openMenu: HTMLElement | null,
+    menuState: HistoryMenuState,
     closeOpenMenu: () => void,
     refresh: RefreshFn,
 ): void => {
     historyList.innerHTML = '';
     closeOpenMenu();
 
-    const history = getSearchHistory();
+    const activeKey = getActiveSearchHistoryKey();
+    const history = getSearchHistory().sort((a, b) => {
+        const aIsActive = activeKey === `${a.platform}::${a.query}`;
+        const bIsActive = activeKey === `${b.platform}::${b.query}`;
+        if (aIsActive === bIsActive) return 0;
+        return aIsActive ? -1 : 1;
+    });
 
     if (history.length === 0) {
         const empty = document.createElement('div');
@@ -27,6 +37,7 @@ export const renderHistory = (
             record,
             () => { sidebar.classList.remove('open'); setTimeout(() => sidebar.classList.add('hidden'), 220); },
             refresh,
+            closeOpenMenu,
         );
 
         const menu = item.querySelector('.history-item-menu') as HTMLElement | null;
@@ -37,7 +48,7 @@ export const renderHistory = (
                 event.stopPropagation();
                 closeOpenMenu();
                 menu.classList.toggle('hidden');
-                openMenu = menu.classList.contains('hidden') ? null : menu;
+                menuState.current = menu.classList.contains('hidden') ? null : menu;
             });
         }
 

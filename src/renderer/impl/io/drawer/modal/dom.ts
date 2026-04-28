@@ -1,8 +1,7 @@
 /// <reference types="electron" />
 
 export const focusModalInput = (modalQueryInput: HTMLTextAreaElement): void => {
-    modalQueryInput.style.height = 'auto';
-    modalQueryInput.style.height = `${Math.min(modalQueryInput.scrollHeight, 160)}px`;
+    modalQueryInput.scrollTop = 0;
     modalQueryInput.focus();
 };
 

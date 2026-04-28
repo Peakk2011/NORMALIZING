@@ -2,7 +2,11 @@ const sidebarPartsHtml = `
     <aside id="historySidebar" class="history-sidebar hidden" aria-hidden="true">
         <div class="sidebar-header">
             <h1 class="sidebar-logo">NORMALIZING</h1>
-            <button id="sidebarClose" class="sidebar-close" type="button" aria-label="Close sidebar">×</button>
+            <button id="sidebarClose" class="sidebar-close" type="button" aria-label="Close sidebar">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M3.5875 19.4125C3.97917 19.8042 4.45 20 5 20L19.0875 20C19.6375 20 20.1083 19.8042 20.5 19.4125C20.8917 19.0208 21.0875 18.55 21.0875 18V6C21.0875 5.45 20.8917 4.97917 20.5 4.5875C20.1083 4.19583 19.6375 4 19.0875 4H5C4.45 4 3.97917 4.19583 3.5875 4.5875C3.19583 4.97917 3 5.45 3 6V18C3 18.55 3.19583 19.0208 3.5875 19.4125ZM9 18H5V6H9V18ZM15 18H11V6H15H17L19.0875 6V18L17 18H15Z" fill="black"/>
+                </svg>
+            </button>
         </div>
         <div class="sidebar-toolbar">
             <button id="sidebarNewBtn" class="sidebar-action-btn" type="button">
@@ -15,7 +19,7 @@ const sidebarPartsHtml = `
             </button>
         </div>
         <div class="sidebar-history">
-            <h2>Recent searches</h2>
+            <h2>Recent</h2>
             <div id="sidebarHistoryList" class="history-list"></div>
         </div>
     </aside>
@@ -23,15 +27,14 @@ const sidebarPartsHtml = `
     <div id="searchModal" class="search-modal hidden" aria-hidden="true" role="dialog" aria-modal="true">
         <div class="modal-overlay" data-close="true"></div>
         <div class="modal-box">
-            <div class="modal-header">
-                <span>Search</span>
-                <button id="searchModalClose" class="modal-close" type="button" aria-label="Close search dialog">×</button>
+            <div class="modal-toolbar">
+                <div class="modal-platforms">
+                    <button id="sidebarSearchFindBtn" type="button">Find</button>
+                    <button id="sidebarSearchClearBtn" type="button">Clear</button>
+                </div>
+                <button id="searchModalClose" class="modal-close" type="button" aria-label="Close search dialog">&times;</button>
             </div>
-            <textarea id="sidebarModalQueryInput" rows="1" placeholder="Type here to search..." autocomplete="off"></textarea>
-            <div class="modal-platforms">
-                <button id="sidebarSearchFindBtn" type="button">Find</button>
-                <button id="sidebarSearchClearBtn" type="button">Clear</button>
-            </div>
+            <textarea id="sidebarModalQueryInput" rows="1" placeholder="Search.." autocomplete="off"></textarea>
         </div>
     </div>
 `;
