@@ -22,6 +22,12 @@ const sidebarPartsHtml = `
             <h2>Recent</h2>
             <div id="sidebar-history-list" class="c-history-list"></div>
         </div>
+        <div class="c-sidebar-footer">
+            <button id="sidebar-settings-btn" class="c-sidebar-settings-btn" type="button">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentcolor"><path d="m370-80-16-128q-13-5-24.5-12T307-235l-119 50L78-375l103-78q-1-7-1-13.5v-27q0-6.5 1-13.5L78-585l110-190 119 50q11-8 23-15t24-12l16-128h220l16 128q13 5 24.5 12t22.5 15l119-50 110 190-103 78q1 7 1 13.5v27q0 6.5-2 13.5l103 78-110 190-118-50q-11 8-23 15t-24 12L590-80H370Zm70-80h79l14-106q31-8 57.5-23.5T639-327l99 41 39-68-86-65q5-14 7-29.5t2-31.5q0-16-2-31.5t-7-29.5l86-65-39-68-99 42q-22-23-48.5-38.5T533-694l-13-106h-79l-14 106q-31 8-57.5 23.5T321-633l-99-41-39 68 86 64q-5 15-7 30t-2 32q0 16 2 31t7 30l-86 65 39 68 99-42q22 23 48.5 38.5T427-266l13 106Zm42-180q58 0 99-41t41-99q0-58-41-99t-99-41q-59 0-99.5 41T342-480q0 58 40.5 99t99.5 41Zm-2-140Z"/></svg>
+                <span>Settings</span>
+            </button>
+        </div>
     </aside>
 
     <div id="search-modal" class="c-search-modal u-hidden" aria-hidden="true" role="dialog" aria-modal="true">
@@ -35,6 +41,33 @@ const sidebarPartsHtml = `
                 <button id="search-modal-close" class="c-modal-close" type="button" aria-label="Close search dialog">&times;</button>
             </div>
             <textarea id="sidebar-modal-query-input" class="c-sidebar-modal-query-input" rows="1" placeholder="Search.." autocomplete="off"></textarea>
+        </div>
+    </div>
+
+    <div id="settings-modal" class="c-settings-modal u-hidden" aria-hidden="true" role="dialog" aria-modal="true">
+        <div class="c-settings-overlay" data-settings-close="true"></div>
+        <div class="c-settings-panel">
+            <div class="c-settings-header">
+                <div class="c-settings-menu-bar" role="tablist" aria-label="Settings sections">
+                    <button class="c-settings-menu-btn is-active" type="button" role="tab" aria-selected="true" data-settings-tab="interface">Interface</button>
+                    <!-- <button class="c-settings-menu-btn" type="button" role="tab" aria-selected="false" data-settings-tab="layout">Layout</button> -->
+                </div>
+                <button id="settings-modal-close" class="c-settings-close" type="button" aria-label="Close settings dialog"><span>×</span></button>
+            </div>
+            <div class="c-settings-body">
+                <section class="c-settings-section is-active" data-settings-panel="interface">
+                    <h3>Theme</h3>
+                    <div class="c-theme-choice-list">
+                        <button class="c-theme-choice-btn" type="button" data-theme-choice="system">System</button>
+                        <button class="c-theme-choice-btn" type="button" data-theme-choice="light">Light</button>
+                        <button class="c-theme-choice-btn" type="button" data-theme-choice="dark">Dark</button>
+                    </div>
+                </section>
+                <section class="c-settings-section" data-settings-panel="layout">
+                    <h3>Layout</h3>
+                    <p>Layout settings will be available soon.</p>
+                </section>
+            </div>
         </div>
     </div>
 `;

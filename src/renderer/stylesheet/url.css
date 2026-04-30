@@ -10,7 +10,7 @@
     justify-content: space-between;
     padding: 0 0px;
     z-index: 19;
-    background-color: var(--theme-white);
+    background-color: var(--theme-bg);
     -webkit-app-region: drag;
 }
 
@@ -73,6 +73,7 @@
     padding: 3px 0px;
     border-radius: 100vmax;
     color: var(--theme-black);
+    background-color: var(--theme-bg);
     border: none;
     outline: none;
     font-family: 'General Sans', 'Sarabun', 'system-ui', 'leelawadee UI', sans-serif;
@@ -85,11 +86,11 @@
 }
 
 .c-search-title::selection {
-    background-color: #00ffc3;
+    background-color: var(--theme-accent-selection);
 }
 
 .c-back-btn:hover, .c-sidebar-toggle:hover {
-    background-color: #e3e3e3;
+    background-color: var(--theme-hover-soft);
     box-shadow: var(--shadow-md);
 }
 
@@ -120,7 +121,7 @@
     line-height: 1;
     font-weight: 600;
     letter-spacing: -0.4px;
-    color: #000;
+    color: var(--theme-black);
     font-family: 'Switzer', 'Sarabun', 'system-ui', 'leelawadee UI', sans-serif;
 }
 
@@ -128,7 +129,7 @@
     text-align: center;
     max-width: 350px;
     margin: 0;
-    color: #666;
+    color: var(--theme-text-muted);
     font-size: 12.5px;
     line-height: 1.5;
 }
@@ -138,23 +139,17 @@
     font-size: 12.5px;
     cursor: pointer;
     background-color: var(--theme-primary);
-    color: white;
+    color: var(--theme-white);
     border: none;
     border-radius: 100vmax;
     font-weight: 400;
     transition: background-color 0.2s ease;
     font-family: 'General Sans', 'Sarabun', 'system-ui', 'leelawadee UI', sans-serif;
-    box-shadow:
-        0 1px 0 rgba(255, 255, 255, 0.6) inset,
-        0 -1px 0 rgba(0, 0, 0, 0.05) inset,
-        0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-web-action);
 }
 
 #open-in-new-tab:hover {
-    box-shadow:
-        0 1px 0 rgba(255, 255, 255, 0.7) inset,
-        0 -1px 0 rgba(0, 0, 0, 0.06) inset,
-        0 4px 10px rgba(0, 0, 0, 0.12);
+    box-shadow: var(--shadow-web-action-hover);
 }
 
 /* Custom scrollbar for app UI */
@@ -168,13 +163,13 @@
 }
 
 *::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.25);
+    background: var(--scrollbar-thumb);
     border-radius: 999px;
-    border: 1px solid rgba(255, 255, 255, 0.5);
+    border: 1px solid var(--scrollbar-thumb-border);
 }
 
 *::-webkit-scrollbar-thumb:hover {
-    background: rgba(0, 0, 0, 0.35);
+    background: var(--scrollbar-thumb-hover);
 }
 
 *::-webkit-scrollbar-corner {
@@ -183,7 +178,7 @@
 
 html {
     scrollbar-width: thin;
-    scrollbar-color: rgba(0, 0, 0, 0.25) transparent;
+    scrollbar-color: var(--scrollbar-thumb) transparent;
 }
 
 .runtime-web .c-result-header {

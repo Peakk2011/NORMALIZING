@@ -1,5 +1,5 @@
 .c-home-shell {
-    width: clamp(280px, 50vw, 350px);
+    width: clamp(280px, 50vw, 320px);
     margin: auto;
     display: flex;
     flex-direction: column;
@@ -20,7 +20,7 @@
 } */
 
 .c-home-shell .c-home-title {
-    width: 260px;
+    width: 90%;
     height: auto;
     object-fit: contain;
     margin: 0 auto;
@@ -29,14 +29,14 @@
 /* Search box */
 
 .c-query-input {
-    width: 85%;
+    width: 88%;
     padding: 10px 16px;
 
     border-radius: 20px;
     border: none;
     outline: none;
 
-    background: rgba(255, 255, 255, 0.24);
+    background: var(--theme-overlay-soft);
     backdrop-filter: blur(18px) saturate(155%);
     /* -webkit-backdrop-filter: blur(14px) saturate(140%); */
 
@@ -53,7 +53,7 @@
     min-height: 40px;
 
     box-shadow: var(--shadow-glass-soft);
-    border: 1px solid rgba(255, 255, 255, 0.34);
+    border: 1px solid var(--theme-border-contrast);
 }
 
 .c-search-row {
@@ -65,7 +65,7 @@
 
 .c-home-shell .c-menu-btn {
     --menu-btn-size: 38px;
-    --menu-btn-bg: rgba(255, 255, 255, 0.5);
+    --menu-btn-bg: var(--theme-overlay-soft);
     --menu-btn-radius: var(--radius-pill);
     --menu-btn-blur: blur(24px) saturate(150%);
     --menu-btn-icon-scale: 1;
@@ -73,17 +73,14 @@
 }
 
 .c-home-shell .c-platform-dropdown {
-    --menu-dropdown-top: -10px;
-    --menu-dropdown-bg: linear-gradient(to top,
-            rgba(255, 255, 255, 0.3),
-            rgba(255, 255, 255, 0.75) 70%,
-            rgba(255, 255, 255, 0.85));
-    --menu-dropdown-outline: rgba(255, 255, 255, 0.42);
+    --menu-dropdown-top: -80px;
+    --menu-dropdown-bg: var(--theme-floating-glass);
+    --menu-dropdown-outline: var(--theme-border-contrast);
     --menu-dropdown-shadow: var(--shadow-modal-panel);
 }
 
 .c-home-shell .c-platform-dropdown button {
-    --menu-dropdown-item-bg: rgba(255, 255, 255, 0.06);
+    --menu-dropdown-item-bg: transparent;
 }
 
 .c-search-hint {

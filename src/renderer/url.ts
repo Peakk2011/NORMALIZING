@@ -5,6 +5,7 @@ import mkReqUrl from './impl/search/mk_req_url.js';
 import { isLikelyUrl, makeHref, recordSearchHistory } from './impl/search/search.js';
 import initSidebar from './impl/io/sidebar.js';
 import { mountSidebarParts } from './impl/io/sidebar_parts.js';
+import { initTheme } from './impl/io/theme.js';
 import type { NormalizingEnv } from './types/window.js';
 import { Visualizer } from '../visualizer/visualizer.js';
 
@@ -49,6 +50,7 @@ setWindowEnv(env);
 document.documentElement.classList.add(`platform-${env.platform}`);
 document.documentElement.classList.add(`runtime-${env.runtime}`);
 document.documentElement.classList.add(env.isDev ? "env-dev" : "env-prod");
+initTheme();
 
 interface SearchData {
     platform: Platform | null;

@@ -1,10 +1,10 @@
 import { createRequire } from "node:module";
 import path from "node:path";
-import type { BrowserWindow as ElectronBrowserWindow, BrowserWindowConstructorOptions } from "electron";
+import type { BrowserWindow as ElectronBrowserWindow, BrowserWindowConstructorOptions, TitleBarOverlayOptions } from "electron";
 import { isDev, preloadPath } from "../config/env.js";
 
 const requireFromAppRoot = createRequire(path.resolve(process.cwd(), "package.json"));
-const { BrowserWindow, nativeImage } = requireFromAppRoot("electron") as typeof import("electron");
+const { BrowserWindow, nativeImage, nativeTheme } = requireFromAppRoot("electron") as typeof import("electron");
 
 // Resolve the correct icon format per platform
 const getIconPath = (): string => {
@@ -23,6 +23,12 @@ const isHttpUrl = (value: string): boolean => {
     }
 };
 
+const getTitleBarOverlay = (): TitleBarOverlayOptions => ({
+    color: "#ffffff00",
+    symbolColor: nativeTheme.shouldUseDarkColors ? "#ffffff" : "#000000",
+    height: 34,
+});
+
 export const createWindow = (url: string, width = 600, height = 585): ElectronBrowserWindow => {
     const windowOptions: BrowserWindowConstructorOptions = {
         width,
@@ -30,11 +36,7 @@ export const createWindow = (url: string, width = 600, height = 585): ElectronBr
         show: true,
         backgroundColor: "#00ffffff",
         titleBarStyle: "hidden",
-        titleBarOverlay: {
-            color: "#ffffff00",
-            symbolColor: "#000000",
-            height: 34,
-        },
+        titleBarOverlay: getTitleBarOverlay(),
         autoHideMenuBar: true,
         // Set icon at window creation so it appears in taskbar, task manager, and dock
         icon: nativeImage.createFromPath(getIconPath()),
@@ -53,6 +55,15 @@ export const createWindow = (url: string, width = 600, height = 585): ElectronBr
     };
 
     const win = new BrowserWindow(windowOptions);
+    const syncTitleBarOverlay = (): void => {
+        if (!win.isDestroyed()) {
+            win.setTitleBarOverlay(getTitleBarOverlay());
+        }
+    };
+    nativeTheme.on("updated", syncTitleBarOverlay);
+    win.on("closed", () => {
+        nativeTheme.removeListener("updated", syncTitleBarOverlay);
+    });
 
     win.webContents.setWindowOpenHandler(({ url: targetUrl }) => {
         if (!isHttpUrl(targetUrl)) {

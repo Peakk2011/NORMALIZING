@@ -25,14 +25,14 @@
 
 .c-menu-btn:hover,
 .c-menu-btn:focus {
-    background-color: var(--menu-btn-hover-bg, #e3e3e3);
+    background-color: var(--menu-btn-hover-bg, var(--theme-hover-soft));
     box-shadow: var(--shadow-md);
     outline: none;
 }
 
 .c-menu-btn:active {
-    background-color: var(--menu-btn-hover-bg, #e3e3e3);
-    border-color: rgba(255, 255, 255, 0.12);
+    background-color: var(--menu-btn-hover-bg, var(--theme-hover-soft));
+    border-color: var(--theme-border-inverse-soft);
 }
 
 .c-platform-dropdown {
@@ -48,6 +48,7 @@
     outline: 1px solid var(--menu-dropdown-outline, var(--theme-border-soft));
     outline-offset: -1px;
     box-shadow: var(--menu-dropdown-shadow, var(--shadow-soft));
+    backdrop-filter: blur(2.5px);
 }
 
 .c-platform-dropdown button {

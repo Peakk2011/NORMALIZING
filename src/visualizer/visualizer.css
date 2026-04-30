@@ -14,7 +14,7 @@
 }
 
 .vz-dialog {
-    background: rgba(248, 248, 248, 0.97);
+    background: var(--theme-surface);
     backdrop-filter: blur(20px);
     /* -webkit-backdrop-filter: blur(20px); */
     border-radius: 8px;
@@ -22,11 +22,7 @@
     overflow: hidden;
     transform: scale(1.1);
     transition: transform 400ms cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    box-shadow:
-        0 1px 0 rgba(255, 255, 255, 0.025) inset,
-        0 8px 24px rgba(0, 0, 0, 0.05),
-        0 24px 80px rgba(0, 0, 0, 0.08),
-        0 60px 160px rgba(0, 0, 0, 0.12);
+    box-shadow: var(--shadow-visualizer);
 }
 
 .vz-overlay.vz-visible .vz-dialog {
@@ -42,7 +38,7 @@
     font-size: 16px;
     font-weight: 400;
     font-family: 'General Sans', sans-serif;
-    color: #000;
+    color: var(--theme-black);
     line-height: 1.35;
     margin: 0 0 2px;
     letter-spacing: -0.25px;
@@ -50,7 +46,7 @@
 
 .vz-message {
     font-size: 13px;
-    color: #000;
+    color: var(--theme-black);
     line-height: 1.45;
     margin: 0;
     opacity: 0.85;
@@ -70,7 +66,7 @@
     border: none;
     background: transparent;
     font-size: 14px;
-    color: #007aff;
+    color: var(--theme-primary);
     cursor: pointer;
     transition: background 0.12s;
     -webkit-tap-highlight-color: transparent;
@@ -79,16 +75,16 @@
 }
 
 .vz-btn+.vz-btn {
-    border-left: 0.5px solid rgba(60, 60, 67, 0.29);
+    border-left: 0.5px solid var(--theme-border-soft-alpha);
 }
 
 .vz-buttons.vz-vertical .vz-btn+.vz-btn {
     border-left: none;
-    border-top: 0.5px solid rgba(60, 60, 67, 0.29);
+    border-top: 0.5px solid var(--theme-border-soft-alpha);
 }
 
 .vz-btn:active {
-    background: rgba(0, 0, 0, 0.08);
+    background: var(--theme-overlay-soft);
 }
 
 .vz-btn.vz-cancel {
@@ -96,5 +92,5 @@
 }
 
 .vz-btn.vz-destructive {
-    color: #ff3b30;
+    color: var(--theme-danger);
 }

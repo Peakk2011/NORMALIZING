@@ -7,6 +7,7 @@ import initBtn from './impl/io/btn.js';
 import initSidebar from './impl/io/sidebar.js';
 import initSubstrate from './impl/hijack/substrate.js';
 import { mountSidebarParts } from './impl/io/sidebar_parts.js';
+import { initTheme } from './impl/io/theme.js';
 import type { NormalizingEnv } from './types/window.js';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -54,6 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
     root.classList.add(`platform-${env.platform}`);
     root.classList.add(`runtime-${env.runtime}`);
     root.classList.add(env.isDev ? "env-dev" : "env-prod");
+    initTheme();
 
     console.log('window.env:', window.env);
 

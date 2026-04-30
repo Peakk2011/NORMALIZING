@@ -3,8 +3,35 @@
     --theme-white: #ffffff;
     --theme-primary: #007aff;
     --theme-bg: #f8f8f6;
-    --theme-surface: #f8f8f8;
+    --theme-surface: #f6f6f4;
     --theme-border-soft: #e4e4e4;
+    --theme-text: #111111;
+    --theme-text-muted: #666666;
+    --theme-text-subtle: #888888;
+    --theme-accent-selection: #00ffc3;
+    --theme-danger: #ff3b30;
+    --theme-hover-soft: #e3e3e3;
+    --theme-hover-neutral: #e1e1e1;
+    --theme-hover-strong: #303030;
+    --theme-panel-hover: #e5e4e1;
+    --theme-sidebar-glass: linear-gradient(to bottom,
+            rgba(250, 250, 250, 0.6) 0%,
+            rgba(250, 250, 250, 0.9) 40%,
+            rgba(250, 250, 250, 0.8) 100%);
+    --theme-floating-glass: linear-gradient(to top,
+            rgba(255, 255, 255, 0.7),
+            rgba(255, 255, 255, 0.8) 70%,
+            rgba(255, 255, 255, 0.95));
+    --theme-modal-glass: linear-gradient(to top,
+            rgba(255, 255, 255, 0.3),
+            rgba(255, 255, 255, 0.85) 70%,
+            rgba(255, 255, 255, 0.95));
+    --theme-overlay: rgba(0, 0, 0, 0.25);
+    --theme-overlay-soft: rgba(127, 127, 127, 0.08);
+    --theme-border-contrast: rgba(255, 255, 255, 0.42);
+    --theme-border-soft-alpha: rgba(17, 17, 17, 0.08);
+    --theme-border-inverse-soft: rgba(255, 255, 255, 0.12);
+    --theme-text-placeholder: rgba(17, 17, 17, 0.34);
 
     --radius-sm: 4px;
     --radius-md: 8px;
@@ -15,14 +42,14 @@
     --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.1), 0 48px 120px rgba(0, 0, 0, 0.14);
     --shadow-glass-soft:
         inset 0 1px 0 rgba(255, 255, 255, 0.52),
-        0 2px 10px rgba(0, 0, 0, 0.05),
-        0 16px 48px rgba(0, 0, 0, 0.08),
-        0 48px 120px rgba(0, 0, 0, 0.12);
+        0 2px 10px rgba(0, 0, 0, 0.08),
+        0 16px 48px rgba(0, 0, 0, 0.12),
+        0 48px 120px rgba(0, 0, 0, 0.16);
     --shadow-glass-strong:
         inset 0 1px 0 rgba(255, 255, 255, 0.58),
-        0 2px 8px rgba(0, 0, 0, 0.08),
-        0 16px 48px rgba(0, 0, 0, 0.12),
-        0 36px 96px rgba(0, 0, 0, 0.16);
+        0 2px 8px rgba(0, 0, 0, 0.14),
+        0 16px 48px rgba(0, 0, 0, 0.20),
+        0 36px 96px rgba(0, 0, 0, 0.26);
     --shadow-modal-panel:
         inset 0 1px 1px rgba(255, 255, 255, 0.08),
         inset 0 0 5px rgba(0, 0, 0, 0.10),
@@ -37,4 +64,118 @@
         0 10px 28px rgba(0, 0, 0, 0.055),
         0 24px 64px rgba(0, 0, 0, 0.075),
         0 48px 120px rgba(0, 0, 0, 0.09);
+    --shadow-action-pill:
+        inset 0 1px 1px rgba(255, 255, 255, 0.4),
+        inset 0 -2px 4px rgba(0, 0, 0, 0.06),
+        0 2px 6px rgba(0, 0, 0, 0.03),
+        0 8px 20px rgba(0, 0, 0, 0.05),
+        0 20px 48px rgba(0, 0, 0, 0.07);
+    --shadow-web-action:
+        0 1px 0 rgba(255, 255, 255, 0.6) inset,
+        0 -1px 0 rgba(0, 0, 0, 0.05) inset,
+        0 2px 4px rgba(0, 0, 0, 0.1);
+    --shadow-web-action-hover:
+        0 1px 0 rgba(255, 255, 255, 0.7) inset,
+        0 -1px 0 rgba(0, 0, 0, 0.06) inset,
+        0 4px 10px rgba(0, 0, 0, 0.12);
+    --shadow-visualizer:
+        0 1px 0 rgba(255, 255, 255, 0.025) inset,
+        0 8px 24px rgba(0, 0, 0, 0.05),
+        0 24px 80px rgba(0, 0, 0, 0.08),
+        0 60px 160px rgba(0, 0, 0, 0.12);
+
+    --scrollbar-thumb: rgba(0, 0, 0, 0.25);
+    --scrollbar-thumb-hover: rgba(0, 0, 0, 0.35);
+    --scrollbar-thumb-border: rgba(255, 255, 255, 0.5);
+}
+
+:root[data-theme="dark"] {
+    /* backgrounds (pure charcoal, no blue cast) */
+    --theme-bg: #0d0d0d;
+    --theme-surface: #181818;
+
+    /* text */
+    --theme-black: #f5f5f5;
+    --theme-white: #121212;
+    --theme-text: #f5f5f5;
+    --theme-text-muted: #9e9e9e;
+    --theme-text-subtle: #757575;
+    --theme-text-placeholder: rgba(245, 245, 245, 0.38);
+
+    /* accent */
+    --theme-primary: #b3d6ff;
+    --theme-accent-selection: #eeeeee;
+
+    /* borders — pure gray */
+    --theme-border-soft: #2e2e2e;
+    --theme-border-contrast: rgba(255, 255, 255, 0.12);
+    --theme-border-soft-alpha: rgba(245, 245, 245, 0.10);
+    --theme-border-inverse-soft: rgba(255, 255, 255, 0.14);
+
+    /* hovers */
+    --theme-hover-soft: #232323;
+    --theme-hover-neutral: #2a2a2a;
+    --theme-hover-strong: #333333;
+    --theme-panel-hover: #2d2d2d;
+
+    /* semantic */
+    --theme-danger: #ef5350;
+
+    /* glass / overlays / shadows */
+    --theme-overlay: rgba(0, 0, 0, 0.6);
+    --theme-overlay-soft: rgba(255, 255, 255, 0.04);
+
+    --theme-sidebar-glass: linear-gradient(to bottom,
+            rgba(20, 20, 20, 0.92) 0%,
+            rgba(16, 16, 16, 0.96) 45%,
+            rgba(15, 15, 15, 0.94) 100%);
+    --theme-floating-glass: linear-gradient(to top,
+            rgba(30, 30, 30, 0.90),
+            rgba(28, 28, 28, 0.94) 70%,
+            rgba(24, 24, 24, 0.98));
+    --theme-modal-glass: linear-gradient(to top,
+            rgba(26, 26, 26, 0.9),
+            rgba(24, 24, 24, 0.96) 70%,
+            rgba(22, 22, 22, 0.99));
+
+    --shadow-action-pill:
+        inset 0 1px 1px rgba(255, 255, 255, 0.300),
+        inset 0 -2px 4px rgba(0, 0, 0, 0.06),
+        0 2px 6px rgba(0, 0, 0, 0.03),
+        0 8px 20px rgba(0, 0, 0, 0.05),
+        0 20px 48px rgba(0, 0, 0, 0.07);
+
+    --shadow-glass-soft:
+        inset 0 0.8px 0 rgba(220, 220, 220, 0.300),
+        0 2px 10px rgba(0, 0, 0, 0.05),
+        0 16px 48px rgba(0, 0, 0, 0.08),
+        0 48px 120px rgba(0, 0, 0, 0.12);
+
+    --shadow-glass-strong:
+        inset 0 1px 0 rgba(220, 220, 220, 0.300),
+        0 2px 8px rgba(0, 0, 0, 0.08),
+        0 16px 48px rgba(0, 0, 0, 0.12),
+        0 36px 96px rgba(0, 0, 0, 0.16);
+
+    --shadow-history-card:
+        inset 0 0.8px 1px rgba(255, 255, 255, 0.150),
+        inset 0 -1px 2px rgba(0, 0, 0, 0.04),
+        0 3px 8px rgba(0, 0, 0, 0.035),
+        0 10px 28px rgba(0, 0, 0, 0.055),
+        0 24px 64px rgba(0, 0, 0, 0.075),
+        0 48px 120px rgba(0, 0, 0, 0.09);
+
+    --shadow-soft: 0 2px 10px rgba(0, 0, 0, 0.5);
+    --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.6);
+    --shadow-lg: 0 18px 50px rgba(0, 0, 0, 0.68),
+        0 60px 140px rgba(0, 0, 0, 0.58);
+
+    /* scrollbar */
+    --scrollbar-thumb: rgba(255, 255, 255, 0.20);
+    --scrollbar-thumb-hover: rgba(255, 255, 255, 0.32);
+    --scrollbar-thumb-border: rgba(0, 0, 0, 0.2);
+
+    .c-home-shell .c-home-title {
+        filter: invert(95%);
+    }
 }
