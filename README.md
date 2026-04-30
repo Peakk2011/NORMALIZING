@@ -1,3 +1,4 @@
+<br>
 <p align="center">
   <img src="https://mint-teams.web.app/Assets/NormalizingIcons.png" height="90px" width="90px"></img>
 </p>
@@ -20,14 +21,15 @@ What Normalizing is doing now will become the new basis of discovery.<br>
 Not following what already exists but setting new criteria that others will have to follow.<br>
 Because when you see a better way, the old way becomes meaningless.<br>
 
+<p align='center'>
+  <a href="https://github.com/Peakk2011/NORMALIZING/releases/tag/1.0.0">Download for Windows</a>
+</p>
+
 ## Policies
 
 - [Code of Conduct](./CODE_OF_CONDUCT.md)
 - [Contributing](./CONTRIBUTING.md)
 - [Security Policy](./SECURITY.md)
-
-<br>
-
 - [How It Works (Technical)](./docs/how-it-works.md)
 - [Architecture (Technical)](./docs/architecture.md)
 - [System Design (Technical)](./docs/system-design.md)
