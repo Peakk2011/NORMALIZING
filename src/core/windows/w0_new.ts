@@ -4,14 +4,22 @@ import type { BrowserWindow as ElectronBrowserWindow, BrowserWindowConstructorOp
 import { isDev, preloadPath } from "../config/env.js";
 
 const requireFromAppRoot = createRequire(path.resolve(process.cwd(), "package.json"));
-const { BrowserWindow } = requireFromAppRoot("electron") as typeof import("electron");
+const { BrowserWindow, nativeImage } = requireFromAppRoot("electron") as typeof import("electron");
+
+// Resolve the correct icon format per platform
+const getIconPath = (): string => {
+    const base = path.resolve(process.cwd(), "assets", "logo", "app_icons");
+    if (process.platform === "darwin") return path.join(base, "application_icon.icns");
+    if (process.platform === "win32") return path.join(base, "application_icon.ico");
+    return path.join(base, "application_icon.png");
+};
+
 
 export const createWindow = (url: string, width = 600, height = 585): ElectronBrowserWindow => {
     const windowOptions: BrowserWindowConstructorOptions = {
         width,
         height,
         show: true,
-        transparent: true,
         backgroundColor: "#00ffffff",
         titleBarStyle: "hidden",
         titleBarOverlay: {
@@ -20,6 +28,8 @@ export const createWindow = (url: string, width = 600, height = 585): ElectronBr
             height: 34,
         },
         autoHideMenuBar: true,
+        // Set icon at window creation so it appears in taskbar, task manager, and dock
+        icon: nativeImage.createFromPath(getIconPath()),
         webPreferences: {
             preload: preloadPath,
             contextIsolation: true,
@@ -34,19 +44,12 @@ export const createWindow = (url: string, width = 600, height = 585): ElectronBr
         },
     };
 
-    if (process.platform === "win32") {
-        windowOptions.backgroundMaterial = "acrylic";
-    }
-
-    if (process.platform === "darwin") {
-        windowOptions.vibrancy = "sidebar";
-        windowOptions.visualEffectState = "active";
-    }
-
     const win = new BrowserWindow(windowOptions);
 
+    // Clear session cache on every window creation to avoid stale data
     void win.webContents.session.clearCache();
 
+    // Open detached DevTools only in development
     if (isDev) {
         setTimeout(() => {
             if (!win.isDestroyed()) {

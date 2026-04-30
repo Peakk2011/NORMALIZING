@@ -20,7 +20,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "npm run build && npx electron .",
     "start:dev": "set VITE_DEV_SERVER_URL=http://127.0.0.1:5173&& npx electron .",
-    "normalizing": "concurrently -n TSC,VITE,ELECTRON \"npm run watch:ts\" \"npm run dev:vite\" \"wait-on http://127.0.0.1:5173 && set VITE_DEV_SERVER_URL=http://127.0.0.1:5173&& npx electron .\""
+    "normalizing": "concurrently -n TSC,VITE,ELECTRON \"npm run watch:ts\" \"npm run dev:vite\" \"wait-on http://127.0.0.1:5173 && set VITE_DEV_SERVER_URL=http://127.0.0.1:5173&& npx electron .\"",
+    "dist:win": "electron-builder --win",
+    "dist:mac": "electron-builder --mac"
   },
   "keywords": [],
   "author": "",
@@ -32,6 +34,19 @@
     "typescript": "^6.0.3",
     "vite": "^8.0.8",
     "wait-on": "^9.0.5"
+  },
+  "build": {
+    "appId": "com.peakk.normalizing",
+    "productName": "NORMALIZING",
+    "mac": {
+        "icon": "assets/icon.icns"
+    },
+    "win": {
+        "icon": "assets/icon.ico"
+    },
+    "linux": {
+        "icon": "assets/icon.png"
+    }
   },
   "dependencies": {
     "electron": "^40.2.1"
