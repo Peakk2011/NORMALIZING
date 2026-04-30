@@ -8,12 +8,5 @@ export const setupSessionHandlers = (ses: Electron.Session): void => {
         callback({ requestHeaders: details.requestHeaders });
     });
 
-    ses.webRequest.onHeadersReceived((details, callback) => {
-        const headers = { ...details.responseHeaders };
-        delete headers["x-frame-options"];
-        delete headers["X-Frame-Options"];
-        callback({ responseHeaders: headers });
-    });
-
     sessionHandlersSetup = true;
 };

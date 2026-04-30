@@ -9,8 +9,6 @@ const { app } = requireFromAppRoot("electron") as typeof import("electron");
 const configureCommandLine = (): void => {
     app.disableHardwareAcceleration();
 
-    app.commandLine.appendSwitch("disable-features", "OutOfBlinkCors");
-    app.commandLine.appendSwitch("disable-site-isolation-trials");
     app.commandLine.appendSwitch("disable-accelerated-2d-canvas");
     app.commandLine.appendSwitch("disable-backgrounding-occluded-windows");
     app.commandLine.appendSwitch("js-flags", "--max-old-space-size=256 --max-semi-space-size=1");

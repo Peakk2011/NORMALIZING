@@ -14,6 +14,14 @@ const getIconPath = (): string => {
     return path.join(base, "application_icon.png");
 };
 
+const isHttpUrl = (value: string): boolean => {
+    try {
+        const parsed = new URL(value);
+        return parsed.protocol === "https:" || parsed.protocol === "http:";
+    } catch {
+        return false;
+    }
+};
 
 export const createWindow = (url: string, width = 600, height = 585): ElectronBrowserWindow => {
     const windowOptions: BrowserWindowConstructorOptions = {
@@ -45,6 +53,28 @@ export const createWindow = (url: string, width = 600, height = 585): ElectronBr
     };
 
     const win = new BrowserWindow(windowOptions);
+
+    win.webContents.setWindowOpenHandler(({ url: targetUrl }) => {
+        if (!isHttpUrl(targetUrl)) {
+            return { action: "deny" };
+        }
+        return { action: "allow" };
+    });
+
+    win.webContents.on("will-attach-webview", (event, webPreferences, params) => {
+        const targetUrl = typeof params.src === "string" ? params.src : "";
+        if (!isHttpUrl(targetUrl)) {
+            event.preventDefault();
+            return;
+        }
+
+        delete webPreferences.preload;
+        webPreferences.nodeIntegration = false;
+        webPreferences.contextIsolation = true;
+        webPreferences.sandbox = true;
+        webPreferences.webSecurity = true;
+        webPreferences.allowRunningInsecureContent = false;
+    });
 
     // Clear session cache on every window creation to avoid stale data
     void win.webContents.session.clearCache();

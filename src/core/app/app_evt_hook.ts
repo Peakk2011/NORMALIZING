@@ -6,12 +6,24 @@ import { clearWindowState, createMainWindow, getMainWindow, openUrlWindow } from
 const requireFromAppRoot = createRequire(path.resolve(process.cwd(), "package.json"));
 const { app, ipcMain, session, shell, BrowserWindow } = requireFromAppRoot("electron") as typeof import("electron");
 
+const isSafeExternalUrl = (value: string): boolean => {
+    try {
+        const parsed = new URL(value);
+        return parsed.protocol === "https:" || parsed.protocol === "http:";
+    } catch {
+        return false;
+    }
+};
+
 export const registerApplicationEvents = (): void => {
     ipcMain.on("open-url-html", (_event, data: { platform: string; query: string }) => {
         openUrlWindow(data.platform, data.query);
     });
 
     ipcMain.on("open-external", (_event, url: string) => {
+        if (!isSafeExternalUrl(url)) {
+            return;
+        }
         void shell.openExternal(url);
     });
 
