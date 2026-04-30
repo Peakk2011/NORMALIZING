@@ -2,6 +2,7 @@
 <p align="center">
   <img src="https://mint-teams.web.app/Assets/NormalizingIcons.png" height="90px" width="90px"></img>
 </p>
+<br>
 
 <h1 align='center'>Normalizing - Internet Index</h1> 
 <br>
@@ -13,6 +14,10 @@ No new tabs. No navigating to the site first. <br>
 No wasting time on steps that shouldn't exist.   
 </p>
 
+<p align='center'>
+  <a href="https://github.com/Peakk2011/NORMALIZING/releases/tag/1.0.0">Download for Windows</a>
+</p>
+
 <br>
 <img src='https://mint-teams.web.app/Assets/Normalizing.png'>
 <br>
@@ -20,10 +25,6 @@ No wasting time on steps that shouldn't exist.
 What Normalizing is doing now will become the new basis of discovery.<br>
 Not following what already exists but setting new criteria that others will have to follow.<br>
 Because when you see a better way, the old way becomes meaningless.<br>
-
-<p align='center'>
-  <a href="https://github.com/Peakk2011/NORMALIZING/releases/tag/1.0.0">Download for Windows</a>
-</p>
 
 ## Policies
 
