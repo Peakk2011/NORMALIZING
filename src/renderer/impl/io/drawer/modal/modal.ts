@@ -3,11 +3,11 @@
 import { focusModalInput, searchInPage } from './dom.js';
 
 export const openSearchModal = (modal: HTMLElement, modalQueryInput: HTMLTextAreaElement): void => {
-    const pageInput = document.getElementById('queryInput') as HTMLTextAreaElement | null;
+    const pageInput = document.getElementById('query-input') as HTMLTextAreaElement | null;
     if (pageInput) {
         modalQueryInput.value = pageInput.value;
     }
-    modal.classList.remove('hidden');
+    modal.classList.remove('u-hidden');
     modal.classList.remove('is-visible');
     modal.setAttribute('aria-hidden', 'false');
     window.requestAnimationFrame(() => {
@@ -17,7 +17,7 @@ export const openSearchModal = (modal: HTMLElement, modalQueryInput: HTMLTextAre
 };
 
 export const closeSearchModal = (modal: HTMLElement): void => {
-    const webview = document.getElementById('resultFrame') as Electron.WebviewTag | null;
+    const webview = document.getElementById('result-frame') as Electron.WebviewTag | null;
     if (webview?.stopFindInPage) {
         try {
             webview.stopFindInPage('clearSelection');
@@ -29,7 +29,7 @@ export const closeSearchModal = (modal: HTMLElement): void => {
     modal.classList.remove('is-visible');
     window.setTimeout(() => {
         if (modal.getAttribute('aria-hidden') === 'true') {
-            modal.classList.add('hidden');
+            modal.classList.add('u-hidden');
         }
     }, 180);
 };
@@ -41,8 +41,8 @@ export const initSearchModal = (
     modalQueryInput: HTMLTextAreaElement,
     closeSidebarFn: () => void,
 ): void => {
-    const modalFind = modal.querySelector<HTMLButtonElement>('#sidebarSearchFindBtn');
-    const modalClear = modal.querySelector<HTMLButtonElement>('#sidebarSearchClearBtn');
+    const modalFind = modal.querySelector<HTMLButtonElement>('#sidebar-search-find-btn');
+    const modalClear = modal.querySelector<HTMLButtonElement>('#sidebar-search-clear-btn');
     const isSearchShortcut = (event: KeyboardEvent): boolean => {
         const hasModifier = event.ctrlKey || event.metaKey;
         return hasModifier && event.code === 'KeyF' && !event.altKey;
@@ -64,7 +64,7 @@ export const initSearchModal = (
     modalClear?.addEventListener('click', () => {
         modalQueryInput.value = '';
         modalQueryInput.focus();
-        const webview = document.getElementById('resultFrame') as Electron.WebviewTag | null;
+        const webview = document.getElementById('result-frame') as Electron.WebviewTag | null;
         if (webview?.stopFindInPage) {
             try {
                 webview.stopFindInPage('clearSelection');

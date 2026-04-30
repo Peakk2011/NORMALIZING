@@ -1,4 +1,4 @@
-.container {
+.c-home-shell {
     width: clamp(280px, 50vw, 350px);
     margin: auto;
     display: flex;
@@ -19,7 +19,7 @@
     font-size: 26px;
 } */
 
-.container .title {
+.c-home-shell .c-home-title {
     width: 260px;
     height: auto;
     object-fit: contain;
@@ -28,7 +28,7 @@
 
 /* Search box */
 
-#queryInput {
+.c-query-input {
     width: 85%;
     padding: 10px 16px;
 
@@ -52,95 +52,41 @@
     overflow-wrap: break-word;
     min-height: 40px;
 
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.52),
-        0 2px 10px rgba(0, 0, 0, 0.05),
-        0 16px 48px rgba(0, 0, 0, 0.08),
-        0 48px 120px rgba(0, 0, 0, 0.12);
+    box-shadow: var(--shadow-glass-soft);
     border: 1px solid rgba(255, 255, 255, 0.34);
 }
 
-.flex-search-box {
+.c-search-row {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
     gap: 8px;
 }
 
-/* menu */
-.container .menu-wrapper {
-    position: relative;
-    display: flex;
-    justify-content: flex-end;
+.c-home-shell .c-menu-btn {
+    --menu-btn-size: 38px;
+    --menu-btn-bg: rgba(255, 255, 255, 0.5);
+    --menu-btn-radius: var(--radius-pill);
+    --menu-btn-blur: blur(24px) saturate(150%);
+    --menu-btn-icon-scale: 1;
+    box-shadow: var(--shadow-glass-strong);
 }
 
-.container .menu-btn {
-    width: 38px;
-    height: 38px;
-    border: 1px solid transparent;
-    background: rgba(255, 255, 255, 0.5);
-    backdrop-filter: blur(24px) saturate(150%);
-    /* -webkit-backdrop-filter: blur(20px); */
-    cursor: pointer;
-    border-radius: 100vmax;
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.58),
-        0 2px 8px rgba(0, 0, 0, 0.08),
-        0 16px 48px rgba(0, 0, 0, 0.12),
-        0 36px 96px rgba(0, 0, 0, 0.16);
-}
-
-.container .menu-btn svg {
-    transform: translateY(1.5px);
-}
-
-/* dropdown */
-.container .platforms {
-    position: fixed;
-    top: -10px;
-    right: 0;
-    display: flex;
-    flex-direction: column;
-    background: linear-gradient(to top,
+.c-home-shell .c-platform-dropdown {
+    --menu-dropdown-top: -10px;
+    --menu-dropdown-bg: linear-gradient(to top,
             rgba(255, 255, 255, 0.3),
             rgba(255, 255, 255, 0.75) 70%,
             rgba(255, 255, 255, 0.85));
-    outline: solid 1px rgba(255, 255, 255, 0.42);
-    outline-offset: -1px;
-    box-shadow:
-        inset 0 1px 1px rgba(255, 255, 255, 0.08),
-        inset 0 0px 5px rgba(0, 0, 0, 0.10),
-        0 2px 6px rgba(0, 0, 0, 0.04),
-        0 12px 32px rgba(0, 0, 0, 0.06),
-        0 32px 80px rgba(0, 0, 0, 0.08),
-        0 64px 160px rgba(0, 0, 0, 0.10);
-    backdrop-filter: blur(4px) saturate(150%);
-    /* -webkit-backdrop-filter: blur(14px); */
-    min-width: 150px;
-    border-radius: 4px;
+    --menu-dropdown-outline: rgba(255, 255, 255, 0.42);
+    --menu-dropdown-shadow: var(--shadow-modal-panel);
 }
 
-.container .platforms button {
-    padding: 13px 12px;
-    line-height: 0;
-    font-family: 'Switzer';
-    border: none;
-    text-align: left;
-    cursor: pointer;
-    background: rgba(255, 255, 255, 0.06);
-    font-size: 14px;
+.c-home-shell .c-platform-dropdown button {
+    --menu-dropdown-item-bg: rgba(255, 255, 255, 0.06);
 }
 
-.container .platforms button:hover {
-    background: #007aff;
-    color: #fff;
-}
-
-.container .hidden {
-    display: none;
-}
-
-.search-hint {
+.c-search-hint {
     font-size: 10.5px;
     letter-spacing: -0.2px;
     opacity: 0.8;

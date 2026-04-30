@@ -9,7 +9,7 @@ export const searchInPage = (query: string): void => {
     const trimmed = query.trim();
     if (!trimmed) return;
 
-    const webview = document.getElementById('resultFrame') as Electron.WebviewTag | null;
+    const webview = document.getElementById('result-frame') as Electron.WebviewTag | null;
     if (webview && typeof webview.findInPage === 'function') {
         try {
             webview.findInPage(trimmed);
@@ -26,7 +26,7 @@ export const searchInPage = (query: string): void => {
 };
 
 export const clearSearchInput = (modalQueryInput: HTMLTextAreaElement): void => {
-    const pageInput = document.getElementById('queryInput') as HTMLTextAreaElement | null;
+    const pageInput = document.getElementById('query-input') as HTMLTextAreaElement | null;
     if (pageInput) {
         pageInput.value = '';
         pageInput.focus();

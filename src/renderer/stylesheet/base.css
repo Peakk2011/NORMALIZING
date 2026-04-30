@@ -1,4 +1,6 @@
+@import './tokens.css';
 @import './typeface.css';
+@import './components/menu.css';
 @import './sidebar.css';
 @import './search.css';
 
@@ -8,14 +10,18 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    color: #000000;
-    fill: #000000;
+    color: var(--theme-black);
+    fill: var(--theme-black);
 }
 
 html,
 body {
     font-family: 'GeistMono', 'General Sans', 'Sarabun', 'system-ui', 'leelawadee UI', sans-serif;
-    background-color: #f8f8f6;
+    background-color: var(--theme-bg);
+}
+
+.u-hidden {
+    display: none !important;
 }
 
 #titlebar {

@@ -5,7 +5,7 @@ const navigateToDirectUrl = (query: string): void => {
 };
 
 const initInput = (): void => {
-    const queryInput = document.getElementById('queryInput') as HTMLTextAreaElement | null;
+    const queryInput = document.getElementById('query-input') as HTMLTextAreaElement | null;
     if (!queryInput) return;
 
     const resize = (): void => {
@@ -15,9 +15,9 @@ const initInput = (): void => {
 
     const updateUrlStyle = (): void => {
         if (isLikelyUrl(queryInput.value)) {
-            queryInput.classList.add('url-detected');
+            queryInput.classList.add('is-url-detected');
         } else {
-            queryInput.classList.remove('url-detected');
+            queryInput.classList.remove('is-url-detected');
         }
     };
 
@@ -43,8 +43,8 @@ const initInput = (): void => {
             event.preventDefault();
             navigate();
         }
-        if (event.key === 'Escape' && queryInput.classList.contains('url-detected')) {
-            queryInput.classList.remove('url-detected');
+        if (event.key === 'Escape' && queryInput.classList.contains('is-url-detected')) {
+            queryInput.classList.remove('is-url-detected');
         }
     });
 

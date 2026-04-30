@@ -54,19 +54,19 @@ export const createHistoryItem = (
 ): HTMLElement => {
     let isRenaming = false;
     const shell = document.createElement('div');
-    shell.className = 'history-item-shell';
+    shell.className = 'c-history-item-shell';
 
     const item = document.createElement('div');
-    item.className = 'history-item';
+    item.className = 'c-history-item';
     if (isActiveSearchHistory(record)) {
-        item.classList.add('active');
+        item.classList.add('is-active');
     }
 
     const mainButton = document.createElement('button');
     mainButton.type = 'button';
-    mainButton.className = 'history-item-main';
+    mainButton.className = 'c-history-item-main';
     mainButton.appendChild(createHistoryItemMainContent(record.query, record.platform));
-    const queryLabel = mainButton.querySelector('.history-query') as HTMLSpanElement | null;
+    const queryLabel = mainButton.querySelector('.c-history-query') as HTMLSpanElement | null;
     mainButton.addEventListener('click', () => {
         if (isRenaming) return;
         closeOpenMenu();
@@ -77,12 +77,12 @@ export const createHistoryItem = (
 
     const menuToggle = document.createElement('button');
     menuToggle.type = 'button';
-    menuToggle.className = 'history-item-menu-toggle';
+    menuToggle.className = 'c-history-item-menu-toggle';
     menuToggle.title = 'History item actions';
     menuToggle.innerHTML = historyItemMenuToggleHtml;
 
     const menu = document.createElement('div');
-    menu.className = 'history-item-menu hidden';
+    menu.className = 'c-history-item-menu u-hidden';
     menu.innerHTML = historyItemMenuHtml();
 
     const copyButton = menu.querySelector<HTMLButtonElement>('[data-action="copy"]');
@@ -121,7 +121,7 @@ export const createHistoryItem = (
         if (!queryLabel) return;
 
         isRenaming = false;
-        item.classList.remove('history-item-renaming');
+        item.classList.remove('is-renaming');
         renameInput.remove();
 
         queryLabel.style.display = '';
@@ -148,11 +148,11 @@ export const createHistoryItem = (
         }
 
         isRenaming = true;
-        item.classList.add('history-item-renaming');
+        item.classList.add('is-renaming');
 
         const renameInput = document.createElement('input');
         renameInput.type = 'text';
-        renameInput.className = 'history-query-input';
+        renameInput.className = 'c-history-query-input';
         renameInput.value = record.query;
         renameInput.setAttribute('aria-label', 'Rename history item');
 
@@ -198,7 +198,7 @@ export const createHistoryItem = (
         event.stopPropagation();
         closeOpenMenu();
         const deletingCurrentRecord = isCurrentRecordOpen(record);
-        shell.classList.add('history-item-shell-removing');
+        shell.classList.add('is-removing');
         window.setTimeout(() => {
             deleteSearchHistory(record);
             if (deletingCurrentRecord) {

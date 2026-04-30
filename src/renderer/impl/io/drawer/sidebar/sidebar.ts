@@ -7,15 +7,15 @@ import { setActiveSearchHistory } from '../../../search/search.js';
 const isUrlPage = window.location.pathname.includes('url.html');
 
 const resolveElements = () => {
-    const sidebarToggle = document.getElementById('sidebarToggle') as HTMLButtonElement | null;
-    const sidebar = document.getElementById('historySidebar') as HTMLElement | null;
-    const sidebarClose = document.getElementById('sidebarClose') as HTMLButtonElement | null;
-    const searchBtn = document.getElementById('sidebarSearchBtn') as HTMLButtonElement | null;
-    const newBtn = document.getElementById('sidebarNewBtn') as HTMLButtonElement | null;
-    const historyList = document.getElementById('sidebarHistoryList') as HTMLElement | null;
-    const modal = document.getElementById('searchModal') as HTMLElement | null;
-    const modalClose = document.getElementById('searchModalClose') as HTMLButtonElement | null;
-    const modalQueryInput = document.getElementById('sidebarModalQueryInput') as HTMLTextAreaElement | null;
+    const sidebarToggle = document.getElementById('sidebar-toggle-btn') as HTMLButtonElement | null;
+    const sidebar = document.getElementById('history-sidebar') as HTMLElement | null;
+    const sidebarClose = document.getElementById('sidebar-close') as HTMLButtonElement | null;
+    const searchBtn = document.getElementById('sidebar-search-btn') as HTMLButtonElement | null;
+    const newBtn = document.getElementById('sidebar-new-btn') as HTMLButtonElement | null;
+    const historyList = document.getElementById('sidebar-history-list') as HTMLElement | null;
+    const modal = document.getElementById('search-modal') as HTMLElement | null;
+    const modalClose = document.getElementById('search-modal-close') as HTMLButtonElement | null;
+    const modalQueryInput = document.getElementById('sidebar-modal-query-input') as HTMLTextAreaElement | null;
 
     if (
         !sidebarToggle || !sidebar || !sidebarClose || !searchBtn ||
@@ -36,7 +36,7 @@ const initSidebar = (): void => {
 
     const closeOpenMenu = (): void => {
         if (menuState.current) {
-            menuState.current.classList.add('hidden');
+            menuState.current.classList.add('u-hidden');
             menuState.current = null;
         }
     };

@@ -3,7 +3,7 @@ import doSearch from '../search/search.js';
 import { closeMenu } from './menu.js';
 
 const initBtn = (): void => {
-    const buttons = document.querySelectorAll<HTMLButtonElement>('.platforms button');
+    const buttons = document.querySelectorAll<HTMLButtonElement>('#platform-menu button');
 
     buttons.forEach(button => {
         button.addEventListener('click', () => {

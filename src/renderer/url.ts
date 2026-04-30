@@ -128,7 +128,7 @@ const loadResult = (url: string): void => {
         return;
     }
 
-    const webview = document.getElementById('resultFrame') as Electron.WebviewTag | null;
+    const webview = document.getElementById('result-frame') as Electron.WebviewTag | null;
     if (!webview) {
         openUrl(url);
         return;
@@ -163,7 +163,7 @@ const goBack = (): void => {
         return;
     }
 
-    const webview = document.getElementById('resultFrame') as Electron.WebviewTag | null;
+    const webview = document.getElementById('result-frame') as Electron.WebviewTag | null;
     if (webview?.canGoBack()) {
         webview.goBack();
         return;
@@ -192,7 +192,7 @@ const searchAgain = (platform: Platform): void => {
 };
 
 const initHeader = (): void => {
-    const searchTitle = document.getElementById('searchTitle') as HTMLInputElement | null;
+    const searchTitle = document.getElementById('search-title-input') as HTMLInputElement | null;
     if (!searchTitle || !currentData) return;
 
     searchTitle.value = currentData.query;
@@ -200,9 +200,9 @@ const initHeader = (): void => {
 
     const updateUrlStyle = (): void => {
         if (isLikelyUrl(searchTitle.value)) {
-            searchTitle.classList.add('url-detected');
+            searchTitle.classList.add('is-url-detected');
         } else {
-            searchTitle.classList.remove('url-detected');
+            searchTitle.classList.remove('is-url-detected');
         }
     };
 
@@ -234,19 +234,19 @@ const initHeader = (): void => {
 };
 
 const initMenu = (): void => {
-    const menuBtn      = document.getElementById('menuBtn');
-    const platformMenu = document.getElementById('platformMenu');
+    const menuBtn      = document.getElementById('menu-btn');
+    const platformMenu = document.getElementById('platform-menu');
 
     if (!menuBtn || !platformMenu) return;
 
     const onMenuClick = (e: Event) => {
         e.stopPropagation();
-        platformMenu.classList.toggle('hidden');
+        platformMenu.classList.toggle('u-hidden');
     };
 
     const onDocumentClick = (e: Event) => {
         if (!platformMenu.contains(e.target as Node)) {
-            platformMenu.classList.add('hidden');
+            platformMenu.classList.add('u-hidden');
         }
     };
 
@@ -258,7 +258,7 @@ const initMenu = (): void => {
         if (!platform || !isValidPlatform(platform)) return;
 
         searchAgain(platform);
-        platformMenu.classList.add('hidden');
+        platformMenu.classList.add('u-hidden');
     };
 
     menuBtn.addEventListener('click', onMenuClick);
@@ -284,7 +284,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     initHeader();
 
-    const backBtn = document.getElementById('backBtn');
+    const backBtn = document.getElementById('back-btn');
     backBtn?.addEventListener('click', goBack);
 
     initMenu();

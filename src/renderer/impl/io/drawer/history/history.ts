@@ -26,7 +26,7 @@ export const renderHistory = (
 
     if (history.length === 0) {
         const empty = document.createElement('div');
-        empty.className = 'history-empty';
+        empty.className = 'c-history-empty';
         empty.textContent = 'No recent searches yet.';
         historyList.appendChild(empty);
         return;
@@ -35,20 +35,20 @@ export const renderHistory = (
     history.slice(0, 12).forEach(record => {
         const item = createHistoryItem(
             record,
-            () => { sidebar.classList.remove('open'); setTimeout(() => sidebar.classList.add('hidden'), 220); },
+            () => { sidebar.classList.remove('is-open'); setTimeout(() => sidebar.classList.add('u-hidden'), 220); },
             refresh,
             closeOpenMenu,
         );
 
-        const menu = item.querySelector('.history-item-menu') as HTMLElement | null;
-        const toggle = item.querySelector('.history-item-menu-toggle') as HTMLElement | null;
+        const menu = item.querySelector('.c-history-item-menu') as HTMLElement | null;
+        const toggle = item.querySelector('.c-history-item-menu-toggle') as HTMLElement | null;
 
         if (menu && toggle) {
             toggle.addEventListener('click', (event: MouseEvent) => {
                 event.stopPropagation();
                 closeOpenMenu();
-                menu.classList.toggle('hidden');
-                menuState.current = menu.classList.contains('hidden') ? null : menu;
+                menu.classList.toggle('u-hidden');
+                menuState.current = menu.classList.contains('u-hidden') ? null : menu;
             });
         }
 

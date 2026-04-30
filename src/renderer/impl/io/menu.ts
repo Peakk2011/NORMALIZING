@@ -1,8 +1,8 @@
-const menuEl = document.getElementById('platformMenu') as HTMLDivElement | null;
-const menuBtn = document.getElementById('menuBtn') as HTMLButtonElement | null;
+const menuEl = document.getElementById('platform-menu') as HTMLDivElement | null;
+const menuBtn = document.getElementById('menu-btn') as HTMLButtonElement | null;
 
 export const closeMenu = (): void => {
-    menuEl?.classList.add('hidden');
+    menuEl?.classList.add('u-hidden');
 };
 
 const initMenu = (): void => {
@@ -10,7 +10,7 @@ const initMenu = (): void => {
 
     menuBtn.addEventListener('click', (event: MouseEvent) => {
         event.stopPropagation();
-        menuEl.classList.toggle('hidden');
+        menuEl.classList.toggle('u-hidden');
     });
 
     menuEl.addEventListener('click', (event: MouseEvent) => {

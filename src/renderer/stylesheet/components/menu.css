@@ -1,0 +1,67 @@
+.c-menu {
+    position: relative;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.c-menu-btn {
+    width: var(--menu-btn-size, 34px);
+    height: var(--menu-btn-size, 34px);
+    border: 1px solid transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.1s ease;
+    background: var(--menu-btn-bg, transparent);
+    border-radius: var(--menu-btn-radius, 0);
+    backdrop-filter: var(--menu-btn-blur, blur(20px));
+    -webkit-app-region: no-drag;
+}
+
+.c-menu-btn svg {
+    transform: translateY(1.5px) scale(var(--menu-btn-icon-scale, 0.85));
+}
+
+.c-menu-btn:hover,
+.c-menu-btn:focus {
+    background-color: var(--menu-btn-hover-bg, #e3e3e3);
+    box-shadow: var(--shadow-md);
+    outline: none;
+}
+
+.c-menu-btn:active {
+    background-color: var(--menu-btn-hover-bg, #e3e3e3);
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+.c-platform-dropdown {
+    position: absolute;
+    top: var(--menu-dropdown-top, 36px);
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    min-width: 150px;
+    border-radius: var(--radius-sm);
+    z-index: 1001;
+    background: var(--menu-dropdown-bg, var(--theme-surface));
+    outline: 1px solid var(--menu-dropdown-outline, var(--theme-border-soft));
+    outline-offset: -1px;
+    box-shadow: var(--menu-dropdown-shadow, var(--shadow-soft));
+}
+
+.c-platform-dropdown button {
+    padding: 13px 12px;
+    line-height: 0;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+    font-size: 14px;
+    font-family: "Switzer";
+    background: var(--menu-dropdown-item-bg, var(--theme-white));
+}
+
+.c-platform-dropdown button:hover {
+    background: var(--theme-primary);
+    color: var(--theme-white);
+}

@@ -15,7 +15,7 @@
 
     <div id="titlebar"></div>
 
-    <button id="sidebarToggle" class="sidebar-toggle" type="button" aria-label="Open history sidebar">
+    <button id="sidebar-toggle-btn" class="c-sidebar-toggle" type="button" aria-label="Open history sidebar">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path fill-rule="evenodd" clip-rule="evenodd"
                 d="M3.5875 19.4125C3.97917 19.8042 4.45 20 5 20L19.0875 20C19.6375 20 20.1083 19.8042 20.5 19.4125C20.8917 19.0208 21.0875 18.55 21.0875 18V6C21.0875 5.45 20.8917 4.97917 20.5 4.5875C20.1083 4.19583 19.6375 4 19.0875 4H5C4.45 4 3.97917 4.19583 3.5875 4.5875C3.19583 4.97917 3 5.45 3 6V18C3 18.55 3.19583 19.0208 3.5875 19.4125ZM9 18H5V6H9V18ZM15 18H11V6H15H17L19.0875 6V18L17 18H15Z"
@@ -23,17 +23,17 @@
         </svg>
     </button>
 
-    <div id="sidebarParts"></div>
+    <div id="sidebar-parts"></div>
 
-    <div class="container">
+    <div class="c-home-shell">
         <!-- <h1 class="title">NORMALIZING</h1> -->
-        <img src="./assets/logo/Normalizing.png" alt="Normalizing Fav Icons" class="title">
+        <img src="./assets/logo/Normalizing.png" alt="Normalizing Fav Icons" class="c-home-title">
 
-        <div class="flex-search-box">
-            <textarea id="queryInput" rows="1" placeholder="Type here to search..." autocomplete="off"></textarea>
+        <div class="c-search-row">
+            <textarea id="query-input" class="c-query-input" rows="1" placeholder="Type here to search..." autocomplete="off"></textarea>
 
-            <div class="menu-wrapper">
-                <button class="menu-btn" id="menuBtn">
+            <div class="c-menu">
+                <button class="c-menu-btn" id="menu-btn">
                     <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px"
                         fill="currentcolor">
                         <path
@@ -41,7 +41,7 @@
                     </svg>
                 </button>
 
-                <div class="platforms hidden" id="platformMenu">
+                <div class="c-platform-dropdown u-hidden" id="platform-menu">
                     <button class="google" data-platform="google"
                         style="border-top-right-radius: 4px; border-top-left-radius: 4px;">Google</button>
                     <button class="youtube" data-platform="youtube">YouTube</button>
@@ -57,7 +57,7 @@
         </div>
     </div>
 
-    <p class="search-hint">
+    <p class="c-search-hint">
         Type your message and select your platform.
     </p>
 

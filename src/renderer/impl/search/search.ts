@@ -83,8 +83,8 @@ export const isActiveSearchHistory = (record: Pick<HistoryRecord, 'platform' | '
     getActiveSearchHistoryKey() === getHistoryRecordKey(record);
 
 const getQueryInput = (): HTMLTextAreaElement | null => {
-    return document.getElementById('queryInput') as HTMLTextAreaElement | null
-        || document.getElementById('sidebarModalQueryInput') as HTMLTextAreaElement | null;
+    return document.getElementById('query-input') as HTMLTextAreaElement | null
+        || document.getElementById('sidebar-modal-query-input') as HTMLTextAreaElement | null;
 };
 
 export const getSearchHistory = (): HistoryRecord[] => {
