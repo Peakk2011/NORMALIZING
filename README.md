@@ -1,8 +1,6 @@
-<br>
 <p align="center">
-  <img src="https://mint-teams.web.app/Assets/NormalizingIcons.png" height="90px" width="90px"></img>
+  <img src="https://mint-teams.web.app/Assets/NormalizingIcons.png" height="92.5px" width="92.5px"></img>
 </p>
-<br>
 
 <h1 align='center'>Normalizing - Internet Index</h1> 
 <br>
