@@ -1,4 +1,26 @@
-# NORMALIZING
+<p align="center">
+  <img src="https://mint-teams.web.app/Assets/NormalizingIcons.png" height="150px" width="150px"></img>
+</p>
+
+<h1 align='center'>Normalizing - Internet Index</h1> 
+<br>
+
+<p align='center'>Type once. Pick a platform. You're there.</p>
+
+<p align='center'>
+No new tabs. No navigating to the site first. <br>
+No wasting time on steps that shouldn't exist.   
+</p>
+
+<br>
+<img src='https://mint-teams.web.app/Assets/Normalizing.png'>
+<br>
+
+What Normalizing is doing now will become the new basis of discovery.<br>
+Not following what already exists but setting new criteria that others will have to follow.<br>
+Because when you see a better way, the old way becomes meaningless.<br>
+
+## How it works
 
 The project is split into three runtime layers:
 
