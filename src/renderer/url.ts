@@ -152,6 +152,19 @@ const loadResult = (url: string): void => {
 
     webview.addEventListener('did-fail-load', handleFailLoad as EventListener);
 
+    // Handle window.open from webview
+    webview.addEventListener('new-window', (event: any) => {
+        event.preventDefault();
+        // Open in new history instead of external browser
+        const newUrl = event.url;
+        if (newUrl && newUrl !== 'about:blank') {
+            const params = new URLSearchParams();
+            params.set('target', newUrl);
+            params.set('query', newUrl);
+            window.location.href = `url.html?${params.toString()}`;
+        }
+    });
+
     webview.src = url;
 };
 
@@ -233,6 +246,30 @@ const initHeader = (): void => {
             performSearch();
         }
     });
+
+    // Show full URL when focused
+    searchTitle.addEventListener('focus', () => {
+        searchTitle.value = currentData?.query ?? '';
+    });
+
+    // Truncate back when blurred if it's a URL
+    searchTitle.addEventListener('blur', () => {
+        if (!currentData) return;
+        if (isLikelyUrl(currentData.query)) {
+            const truncated = currentData.query.length > 40
+                ? currentData.query.slice(0, 20) + '...' + currentData.query.slice(-17)
+                : currentData.query;
+            searchTitle.value = truncated;
+        }
+    });
+
+    // Initial truncate if URL
+    if (isLikelyUrl(currentData.query)) {
+        const truncated = currentData.query.length > 40
+            ? currentData.query.slice(0, 20) + '...' + currentData.query.slice(-17)
+            : currentData.query;
+        searchTitle.value = truncated;
+    }
 };
 
 const initMenu = (): void => {

@@ -111,7 +111,7 @@
 
 .c-sidebar-toolbar {
     display: flex;
-    gap: 6px;
+    gap: 8px;
     flex-wrap: wrap;
     margin-bottom: 20px;
 }
@@ -119,19 +119,21 @@
 .c-sidebar-action-btn {
     flex: 1;
     min-width: 100px;
-    padding: 0.4rem 0.5rem;
-    text-align: left;
+    padding: 0.45rem 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     background: var(--theme-black);
     box-shadow: var(--shadow-action-pill);
-    transition: background-color 0.15s ease;
+    color: var(--theme-white);
+    transition: background-color 0.15s ease, color 0.15s ease;
 }
 
 .c-sidebar-action-btn svg {
-    vertical-align: middle;
-    line-height: 0;
     width: fit-content;
-    height: fit-content;
-    margin-left: 0.3rem;
+    width: 20px;
+    height: 22px;
+    margin-left: 0;
 }
 
 .c-sidebar-action-btn svg path {
@@ -139,13 +141,61 @@
 }
 
 .c-sidebar-action-btn span {
-    vertical-align: middle;
-    transform: translateX(-2px);
-    color: var(--theme-white);
+    color: inherit;
     font-size: 14px;
     font-weight: 550;
     letter-spacing: -0.2px;
     user-select: none;
+    margin: 0;
+}
+
+:root {
+    --sidebar-width: min(250px, 100vw);
+}
+
+@media (min-width: 768px) {
+    .c-history-sidebar {
+        width: var(--sidebar-width);
+        max-width: 100%;
+        transform: translateX(-110%);
+        box-shadow: none;
+    }
+
+    .c-sidebar-close {
+        display: none;
+    }
+
+    .c-sidebar-logo {
+        margin-top: 1.05rem;
+        margin-bottom: 1.1rem;
+    }
+
+    body.has-sidebar-open .c-sidebar-toggle {
+        left: calc(var(--sidebar-width) + 8px);
+    }
+
+    body.has-sidebar-open .c-home-shell {
+        left: calc(50% + var(--sidebar-width) / 2);
+        transition: left 0.22s ease;
+    }
+
+    body.has-sidebar-open .c-search-hint {
+        left: calc(50% + var(--sidebar-width) / 2);
+        transition: left 0.22s ease;
+    }
+
+    body.has-sidebar-open .c-result-header {
+        left: var(--sidebar-width);
+        width: calc(100% - var(--sidebar-width));
+        transition: left 0.22s ease, width 0.22s ease;
+    }
+
+    body.has-sidebar-open #result-frame,
+    body.has-sidebar-open #web-fallback {
+        left: var(--sidebar-width);
+        width: calc(100% - var(--sidebar-width));
+        transition: left 0.22s ease, width 0.22s ease;
+    }
 }
 
 .c-sidebar-action-secondary {
@@ -165,8 +215,7 @@
 }
 
 .c-sidebar-action-btn:hover {
-    background: var(--theme-hover-strong);
-    color: var(--theme-white);
+    filter: brightness(90%);
 }
 
 .c-sidebar-action-secondary:hover {
@@ -356,6 +405,11 @@
     height: 16px;
 }
 
+/* 
+    The problem is that you can't change the menu background because there are buttons inside.
+    They have their own background that overrides the menu background.
+*/
+
 .c-history-item-menu {
     position: absolute;
     top: calc(100% + 8px);
@@ -364,7 +418,7 @@
     flex-direction: column;
 
     /* background: var(--theme-floating-glass); */
-    background-color: #000000;
+    background-color: var(--theme-black) !important;
     outline: solid 1px var(--theme-border-contrast);
     outline-offset: -1px;
     box-shadow: var(--shadow-modal-panel);
@@ -391,6 +445,7 @@
     display: flex;
     align-items: center;
     font-family: 'Switzer';
+    color: var(--theme-white);
 }
 
 .c-history-item-menu-btn:hover {

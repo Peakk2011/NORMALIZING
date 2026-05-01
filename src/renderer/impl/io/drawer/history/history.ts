@@ -38,19 +38,8 @@ export const renderHistory = (
             () => { sidebar.classList.remove('is-open'); setTimeout(() => sidebar.classList.add('u-hidden'), 220); },
             refresh,
             closeOpenMenu,
+            menuState,
         );
-
-        const menu = item.querySelector('.c-history-item-menu') as HTMLElement | null;
-        const toggle = item.querySelector('.c-history-item-menu-toggle') as HTMLElement | null;
-
-        if (menu && toggle) {
-            toggle.addEventListener('click', (event: MouseEvent) => {
-                event.stopPropagation();
-                closeOpenMenu();
-                menu.classList.toggle('u-hidden');
-                menuState.current = menu.classList.contains('u-hidden') ? null : menu;
-            });
-        }
 
         historyList.appendChild(item);
     });

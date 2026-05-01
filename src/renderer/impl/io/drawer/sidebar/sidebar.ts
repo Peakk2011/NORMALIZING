@@ -6,7 +6,24 @@ import { setActiveSearchHistory } from '../../../search/search.js';
 import { getThemePreference, setThemePreference, type ThemePreference } from '../../theme.js';
 
 const isUrlPage = window.location.pathname.includes('url.html');
+const SIDEBAR_STATE_KEY = 'sidebarOpenState';
 
+const saveSidebarState = (isOpen: boolean): void => {
+    try {
+        localStorage.setItem(SIDEBAR_STATE_KEY, isOpen.toString());
+    } catch {
+        // ignore storage errors
+    }
+};
+
+const getSidebarState = (): boolean => {
+    try {
+        const stored = localStorage.getItem(SIDEBAR_STATE_KEY);
+        return stored === 'true' && window.innerWidth > 768;
+    } catch {
+        return false;
+    }
+};
 const resolveElements = () => {
     const sidebarToggle = document.getElementById('sidebar-toggle-btn') as HTMLButtonElement | null;
     const sidebar = document.getElementById('history-sidebar') as HTMLElement | null;
@@ -114,12 +131,15 @@ const initSidebar = (): void => {
 
     sidebarToggle.addEventListener('click', (event: MouseEvent) => {
         event.stopPropagation();
+        const wasOpen = sidebar.classList.contains('is-open');
         toggleSidebar(sidebar, refresh);
+        saveSidebarState(!wasOpen);
     });
 
     sidebarClose.addEventListener('click', (event: MouseEvent) => {
         event.stopPropagation();
         closeSidebar(sidebar);
+        saveSidebarState(false);
     });
 
     searchBtn.addEventListener('click', () => {
@@ -161,6 +181,8 @@ const initSidebar = (): void => {
         });
     });
 
+    const isCompactScreen = (): boolean => window.innerWidth <= 768;
+
     document.addEventListener('click', (event: MouseEvent) => {
         const target = event.target as Node | null;
         if (!target) return;
@@ -168,7 +190,7 @@ const initSidebar = (): void => {
             return;
         }
 
-        if (!sidebar.contains(target) && !sidebarToggle.contains(target)) {
+        if (isCompactScreen() && !sidebar.contains(target) && !sidebarToggle.contains(target)) {
             closeSidebar(sidebar);
         }
 
@@ -184,6 +206,12 @@ const initSidebar = (): void => {
     });
 
     initSearchModal(modal, modalOverlay, modalClose, modalQueryInput, () => closeSidebar(sidebar));
+
+    // Restore sidebar state on page load
+    if (getSidebarState()) {
+        openSidebar(sidebar, refresh);
+    }
+
     refresh();
 };
 

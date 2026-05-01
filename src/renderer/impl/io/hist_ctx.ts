@@ -1,9 +1,16 @@
+const truncateUrl = (url: string, maxLength: number = 40): string => {
+    if (url.length <= maxLength) return url;
+    const start = url.slice(0, Math.floor(maxLength / 2) - 2);
+    const end = url.slice(-Math.floor(maxLength / 2) + 1);
+    return `${start}...${end}`;
+};
+
 export const createHistoryItemMainContent = (query: string, platform: string): DocumentFragment => {
     const fragment = document.createDocumentFragment();
 
     const querySpan = document.createElement('span');
     querySpan.className = 'c-history-query';
-    querySpan.textContent = query;
+    querySpan.textContent = truncateUrl(query);
 
     const platformSpan = document.createElement('span');
     platformSpan.className = 'c-history-platform';

@@ -51,8 +51,44 @@ const isHistoryRecord = (value: unknown): value is HistoryRecord => {
         && typeof value.timestamp === 'number');
 };
 
+const getElectronHistory = (): unknown[] => {
+    try {
+        return window.electronAPI?.loadHist?.() ?? [];
+    } catch {
+        return [];
+    }
+};
+
+const setElectronHistory = (history: unknown[]): void => {
+    try {
+        window.electronAPI?.saveHist?.(history);
+    } catch {
+        // ignore storage failures
+    }
+};
+
+const getElectronActiveHistoryKey = (): string | null => {
+    try {
+        return window.electronAPI?.loadActive?.() ?? null;
+    } catch {
+        return null;
+    }
+};
+
+const setElectronActiveHistoryKey = (activeKey: string | null): void => {
+    try {
+        window.electronAPI?.saveActive?.(activeKey);
+    } catch {
+        // ignore storage failures
+    }
+};
+
 const saveSearchHistory = (history: HistoryRecord[]): void => {
     try {
+        if (typeof window.electronAPI?.saveHist === "function") {
+            setElectronHistory(history);
+            return;
+        }
         localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
     } catch {
         // ignore storage errors
@@ -61,6 +97,9 @@ const saveSearchHistory = (history: HistoryRecord[]): void => {
 
 export const getActiveSearchHistoryKey = (): string | null => {
     try {
+        if (typeof window.electronAPI?.loadActive === "function") {
+            return getElectronActiveHistoryKey();
+        }
         return localStorage.getItem(ACTIVE_HISTORY_KEY);
     } catch {
         return null;
@@ -70,10 +109,20 @@ export const getActiveSearchHistoryKey = (): string | null => {
 export const setActiveSearchHistory = (record: Pick<HistoryRecord, 'platform' | 'query'> | null): void => {
     try {
         if (!record) {
+            if (typeof window.electronAPI?.saveActive === "function") {
+                setElectronActiveHistoryKey(null);
+                return;
+            }
             localStorage.removeItem(ACTIVE_HISTORY_KEY);
             return;
         }
-        localStorage.setItem(ACTIVE_HISTORY_KEY, getHistoryRecordKey(record));
+
+        const key = getHistoryRecordKey(record);
+        if (typeof window.electronAPI?.saveActive === "function") {
+            setElectronActiveHistoryKey(key);
+            return;
+        }
+        localStorage.setItem(ACTIVE_HISTORY_KEY, key);
     } catch {
         // ignore storage errors
     }
@@ -89,12 +138,13 @@ const getQueryInput = (): HTMLTextAreaElement | null => {
 
 export const getSearchHistory = (): HistoryRecord[] => {
     try {
-        const raw = localStorage.getItem(HISTORY_KEY);
-        if (!raw) return [];
-        const parsed = JSON.parse(raw);
-        if (!Array.isArray(parsed)) return [];
+        const raw = typeof window.electronAPI?.loadHist === "function"
+            ? getElectronHistory()
+            : JSON.parse(localStorage.getItem(HISTORY_KEY) ?? "[]");
 
-        const normalized = parsed
+        if (!Array.isArray(raw)) return [];
+
+        const normalized = raw
             .filter(isHistoryRecord)
             .map(item => ({ ...item, pinned: Boolean(item.pinned) }));
 

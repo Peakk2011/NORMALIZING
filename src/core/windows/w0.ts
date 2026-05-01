@@ -28,7 +28,7 @@ export const openUrlWindow = (platform: string, query: string): void => {
     }
 
     const urlHtmlUrl = `${rendererUrl.replace("index.html", "url.html")}?platform=${encodeURIComponent(platform)}&query=${encodeURIComponent(query)}`;
-    const newWin = createWindow(urlHtmlUrl, 600, 585);
+    const newWin = createWindow(urlHtmlUrl, 900, 780);
 
     newWin.on("closed", () => {
         urlViewWindows.delete(windowKey);
@@ -38,7 +38,7 @@ export const openUrlWindow = (platform: string, query: string): void => {
 };
 
 export const createMainWindow = (): BrowserWindow => {
-    const win = createWindow(rendererUrl, 600, 585);
+    const win = createWindow(rendererUrl, 900, 780);
     mainWindow = win;
     win.on("closed", () => {
         mainWindow = null;

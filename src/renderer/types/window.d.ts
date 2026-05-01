@@ -2,6 +2,10 @@ export interface ElectronAPI {
     openExternal: (url: string) => void;
     openUrlHtml: (platform: string, query: string) => void;
     setTheme: (source: "system" | "light" | "dark") => void;
+    loadHist: () => unknown[];
+    saveHist: (history: unknown[]) => void;
+    loadActive: () => string | null;
+    saveActive: (activeKey: string | null) => void;
 }
 
 export interface NormalizingEnv {

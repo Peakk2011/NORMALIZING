@@ -9,6 +9,10 @@ export const exposeApi = (
         openExternal: (url: string) => ipcRenderer.send("open-external", url),
         openUrlHtml: (platform: string, query: string) => ipcRenderer.send("open-url-html", { platform, query }),
         setTheme: (source: "system" | "light" | "dark") => ipcRenderer.send("set-theme", source),
+        loadHist: () => ipcRenderer.sendSync("load-hist"),
+        saveHist: (history: unknown[]) => ipcRenderer.send("save-hist", history),
+        loadActive: () => ipcRenderer.sendSync("load-active"),
+        saveActive: (activeKey: string | null) => ipcRenderer.send("save-active", activeKey),
     });
 };
 

@@ -45,7 +45,7 @@ export const refreshOverlay = (): void => {
     BrowserWindow.getAllWindows().forEach(titlebarOverlayWin);
 };
 
-export const createWindow = (url: string, width = 600, height = 585): ElectronBrowserWindow => {
+export const createWindow = (url: string, width = 900, height = 780): ElectronBrowserWindow => {
     const windowOptions: BrowserWindowConstructorOptions = {
         width,
         height,

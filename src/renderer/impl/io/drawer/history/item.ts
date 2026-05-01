@@ -51,6 +51,7 @@ export const createHistoryItem = (
     closeSidebarFn: CloseSidebarFn,
     refresh: RefreshFn,
     closeOpenMenu: () => void,
+    menuState: { current: HTMLElement | null },
 ): HTMLElement => {
     let isRenaming = false;
     const shell = document.createElement('div');
@@ -94,6 +95,18 @@ export const createHistoryItem = (
         shell.append(item, menu);
         return shell;
     }
+
+    menuToggle.addEventListener('click', (event: MouseEvent) => {
+        event.stopPropagation();
+        if (menu.classList.contains('u-hidden')) {
+            closeOpenMenu();
+            menu.classList.remove('u-hidden');
+            menuState.current = menu;
+        } else {
+            menu.classList.add('u-hidden');
+            menuState.current = null;
+        }
+    });
 
     copyButton.addEventListener('click', async (event: MouseEvent) => {
         event.stopPropagation();
@@ -212,7 +225,7 @@ export const createHistoryItem = (
         }, 180);
     });
 
-    item.append(mainButton, menuToggle);
-    shell.append(item, menu);
+    item.append(mainButton, menuToggle, menu);
+    shell.append(item);
     return shell;
 };
