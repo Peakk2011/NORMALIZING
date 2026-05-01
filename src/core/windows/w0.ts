@@ -1,6 +1,6 @@
 import type { BrowserWindow } from "electron";
 import { rendererUrl } from "../config/env.js";
-import { createWindow } from "./w0_new.js";
+import { createWindow, refreshOverlay as refreshOverlayImpl } from "./w0_new.js";
 
 const MAX_WINDOWS = 3;
 
@@ -48,6 +48,8 @@ export const createMainWindow = (): BrowserWindow => {
 };
 
 export const getMainWindow = (): BrowserWindow | null => mainWindow;
+
+export const refreshOverlay = refreshOverlayImpl;
 
 export const clearWindowState = (): void => {
     urlViewWindows.clear();

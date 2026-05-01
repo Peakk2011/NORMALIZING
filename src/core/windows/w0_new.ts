@@ -1,6 +1,12 @@
 import { createRequire } from "node:module";
 import path from "node:path";
-import type { BrowserWindow as ElectronBrowserWindow, BrowserWindowConstructorOptions, TitleBarOverlayOptions } from "electron";
+
+import type {
+    BrowserWindow as ElectronBrowserWindow,
+    BrowserWindowConstructorOptions,
+    TitleBarOverlayOptions
+} from "electron";
+
 import { isDev, preloadPath } from "../config/env.js";
 
 const requireFromAppRoot = createRequire(path.resolve(process.cwd(), "package.json"));
@@ -28,6 +34,16 @@ const getTitleBarOverlay = (): TitleBarOverlayOptions => ({
     symbolColor: nativeTheme.shouldUseDarkColors ? "#ffffff" : "#000000",
     height: 34,
 });
+
+const titlebarOverlayWin = (win: ElectronBrowserWindow): void => {
+    if (!win.isDestroyed()) {
+        win.setTitleBarOverlay(getTitleBarOverlay());
+    }
+};
+
+export const refreshOverlay = (): void => {
+    BrowserWindow.getAllWindows().forEach(titlebarOverlayWin);
+};
 
 export const createWindow = (url: string, width = 600, height = 585): ElectronBrowserWindow => {
     const windowOptions: BrowserWindowConstructorOptions = {

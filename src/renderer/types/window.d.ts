@@ -1,6 +1,7 @@
 export interface ElectronAPI {
     openExternal: (url: string) => void;
     openUrlHtml: (platform: string, query: string) => void;
+    setTheme: (source: "system" | "light" | "dark") => void;
 }
 
 export interface NormalizingEnv {

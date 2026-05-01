@@ -34,14 +34,18 @@ export const setThemePreference = (preference: ThemePreference): void => {
         // ignore storage failures and still apply in-memory preference
     }
     applyTheme(next);
+    window.electronAPI?.setTheme?.(next);
 };
 
 export const initTheme = (): void => {
-    applyTheme(getThemePreference());
+    const preference = getThemePreference();
+    applyTheme(preference);
+    window.electronAPI?.setTheme?.(preference);
 
     const media = window.matchMedia(DARK_QUERY);
     media.addEventListener("change", () => {
         if (getThemePreference() !== "system") return;
         applyTheme("system");
+        window.electronAPI?.setTheme?.("system");
     });
 };

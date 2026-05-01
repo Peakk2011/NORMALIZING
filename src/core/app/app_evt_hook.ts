@@ -1,10 +1,16 @@
 import { createRequire } from "node:module";
 import path from "node:path";
 import { setupSessionHandlers } from "../config/s0.js";
-import { clearWindowState, createMainWindow, getMainWindow, openUrlWindow } from "../windows/w0.js";
+import {
+    clearWindowState,
+    createMainWindow,
+    getMainWindow,
+    openUrlWindow,
+    refreshOverlay
+} from "../windows/w0.js";
 
 const requireFromAppRoot = createRequire(path.resolve(process.cwd(), "package.json"));
-const { app, ipcMain, session, shell, BrowserWindow } = requireFromAppRoot("electron") as typeof import("electron");
+const { app, ipcMain, nativeTheme, session, shell, BrowserWindow } = requireFromAppRoot("electron") as typeof import("electron");
 
 const isSafeExternalUrl = (value: string): boolean => {
     try {
@@ -25,6 +31,13 @@ export const registerApplicationEvents = (): void => {
             return;
         }
         void shell.openExternal(url);
+    });
+
+    ipcMain.on("set-theme", (_event, source: string) => {
+        if (source === "system" || source === "light" || source === "dark") {
+            nativeTheme.themeSource = source;
+            refreshOverlay();
+        }
     });
 
     app.whenReady().then(() => {

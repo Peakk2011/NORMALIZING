@@ -8,6 +8,7 @@ export const exposeApi = (
     contextBridge.exposeInMainWorld("electronAPI", {
         openExternal: (url: string) => ipcRenderer.send("open-external", url),
         openUrlHtml: (platform: string, query: string) => ipcRenderer.send("open-url-html", { platform, query }),
+        setTheme: (source: "system" | "light" | "dark") => ipcRenderer.send("set-theme", source),
     });
 };
 
