@@ -20,7 +20,31 @@ const sendLog = (source: "renderer" | "preload", method: ConsoleMethod, args: un
 };
 
 export const preload_init = (): void => {
+    const platformStr = process.platform === 'darwin' ? 'Macintosh; Intel Mac OS X 10_15_7' :
+                        process.platform === 'linux' ? 'X11; Linux x86_64' :
+                        'Windows NT 10.0; Win64; x64';
+    const ua = `Mozilla/5.0 (${platformStr}) AppleWebKit/537.36 (KHTML, like Gecko) Normalizing/1.0.0 Safari/537.36`;
+
+    // Override navigator properties to reflect Normalizing
+    Object.defineProperty(navigator, 'userAgent', {
+        value: ua,
+        writable: false,
+        configurable: false
+    });
+
+    Object.defineProperty(navigator, 'appName', {
+        value: 'Normalizing',
+        writable: false,
+        configurable: false
+    });
+
     const env = detectEnv();
+
+    Object.defineProperty(navigator, 'appVersion', {
+        value: `5.0 (${platformStr}) AppleWebKit/537.36 (KHTML, like Gecko) Normalizing/1.0.0 Safari/537.36`,
+        writable: false,
+        configurable: false
+    });
 
     installPreloadConsole(consoleMethods, sendLog);
     installRendererConsoleBridge(
@@ -38,6 +62,22 @@ export const preload_init = (): void => {
 
     exposeApi(contextBridge, ipcRenderer);
     exposeEnv(contextBridge, env);
+
+    // Override navigator properties to reflect Normalizing
+    Object.defineProperty(navigator, 'appName', {
+        value: 'Normalizing',
+        writable: false,
+        configurable: false
+    });
+
+    const platform = env.platform === 'darwin' ? 'Macintosh; Intel Mac OS X 10_15_7' :
+                     env.platform === 'linux' ? 'X11; Linux x86_64' :
+                     'Windows NT 10.0; Win64; x64';
+    Object.defineProperty(navigator, 'appVersion', {
+        value: `5.0 (${platform}) AppleWebKit/537.36 (KHTML, like Gecko) Normalizing/1.0.0 Safari/537.36`,
+        writable: false,
+        configurable: false
+    });
 
     ipcRenderer.send("preload-ready");
 
