@@ -8,6 +8,8 @@
     top: 45%;
     left: 50%;
     transform: translate(-50%, -50%);
+    transition: transform 0.22s ease;
+    will-change: transform;
 }
 
 /* title scoped */
@@ -92,4 +94,6 @@
     left: 50%;
     transform: translateX(-50%);
     text-align: center;
+    transition: transform 0.22s ease;
+    will-change: transform;
 }

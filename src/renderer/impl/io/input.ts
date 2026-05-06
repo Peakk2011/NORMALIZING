@@ -1,7 +1,8 @@
 import doSearch, { isLikelyUrl } from '../search/search.js';
+import { getDefaultPlatform } from './settings.js';
 
 const navigateToDirectUrl = (query: string): void => {
-    doSearch('google', query);
+    doSearch(getDefaultPlatform(), query);
 };
 
 const initInput = (): void => {
@@ -30,7 +31,7 @@ const initInput = (): void => {
             return;
         }
 
-        doSearch('google', query);
+        doSearch(getDefaultPlatform(), query);
     };
 
     queryInput.addEventListener('input', () => {

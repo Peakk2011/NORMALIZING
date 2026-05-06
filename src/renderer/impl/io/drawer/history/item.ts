@@ -101,9 +101,13 @@ export const createHistoryItem = (
         if (menu.classList.contains('u-hidden')) {
             closeOpenMenu();
             menu.classList.remove('u-hidden');
+            shell.classList.add('is-menu-open');
+            item.classList.add('is-menu-open');
             menuState.current = menu;
         } else {
             menu.classList.add('u-hidden');
+            shell.classList.remove('is-menu-open');
+            item.classList.remove('is-menu-open');
             menuState.current = null;
         }
     });
@@ -116,9 +120,13 @@ export const createHistoryItem = (
         try {
             await copyText(url);
             closeOpenMenu();
+            shell.classList.remove('is-menu-open');
+            item.classList.remove('is-menu-open');
             await Visualizer({ title: 'Copied URL.' });
         } catch {
             closeOpenMenu();
+            shell.classList.remove('is-menu-open');
+            item.classList.remove('is-menu-open');
             await Visualizer({
                 title: 'Copy failed.',
                 message: 'Unable to copy this URL right now.',
@@ -156,6 +164,8 @@ export const createHistoryItem = (
     renameButton.addEventListener('click', (event: MouseEvent) => {
         event.stopPropagation();
         closeOpenMenu();
+        shell.classList.remove('is-menu-open');
+        item.classList.remove('is-menu-open');
         if (!queryLabel || isRenaming) {
             return;
         }
@@ -210,6 +220,8 @@ export const createHistoryItem = (
     deleteButton.addEventListener('click', (event: MouseEvent) => {
         event.stopPropagation();
         closeOpenMenu();
+        shell.classList.remove('is-menu-open');
+        item.classList.remove('is-menu-open');
         const deletingCurrentRecord = isCurrentRecordOpen(record);
         shell.classList.add('is-removing');
         window.setTimeout(() => {

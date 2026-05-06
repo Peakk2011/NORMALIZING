@@ -8,6 +8,12 @@ export const exposeApi = (
     contextBridge.exposeInMainWorld("electronAPI", {
         openExternal: (url: string) => ipcRenderer.send("open-external", url),
         openUrlHtml: (platform: string, query: string) => ipcRenderer.send("open-url-html", { platform, query }),
+        showWebviewContextMenu: (payload: {
+            webContentsId: number;
+            currentUrl: string | null;
+            canCopy: boolean;
+            canPaste: boolean;
+        }) => ipcRenderer.send("show-webview-context-menu", payload),
         setTheme: (source: "system" | "light" | "dark") => ipcRenderer.send("set-theme", source),
         loadHist: () => ipcRenderer.sendSync("load-hist"),
         saveHist: (history: unknown[]) => ipcRenderer.send("save-hist", history),

@@ -29,6 +29,7 @@ Because when you see a better way, the old way becomes meaningless.<br>
 - [Code of Conduct](./CODE_OF_CONDUCT.md)
 - [Contributing](./CONTRIBUTING.md)
 - [Security Policy](./SECURITY.md)
+- [Build Guide](./docs/build.md)
 - [How It Works (Technical)](./docs/how-it-works.md)
 - [Architecture (Technical)](./docs/architecture.md)
 - [System Design (Technical)](./docs/system-design.md)

@@ -43,6 +43,12 @@
     "directories": {
       "output": "release"
     },
+    "extraResources": [
+      {
+        "from": "assets/logo/app_icons",
+        "to": "assets/logo/app_icons"
+      }
+    ],
     "mac": {
       "icon": "assets/logo/app_icons/application_icon.icns"
     },

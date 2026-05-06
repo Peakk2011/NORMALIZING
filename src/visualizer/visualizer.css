@@ -4,7 +4,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 9999;
+    z-index: 20050;
     opacity: 0;
     transition: opacity 0.22s ease;
 }
@@ -36,12 +36,12 @@
 
 .vz-title {
     font-size: 16px;
-    font-weight: 400;
-    font-family: 'General Sans', sans-serif;
+    font-weight: 550;
+    font-family: 'General Sans', 'Anuphan', 'system-ui', sans-serif;
     color: var(--theme-black);
     line-height: 1.35;
     margin: 0 0 2px;
-    letter-spacing: -0.25px;
+    letter-spacing: -0.3px;
 }
 
 .vz-message {

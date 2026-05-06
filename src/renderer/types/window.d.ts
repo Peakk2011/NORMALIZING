@@ -1,6 +1,12 @@
 export interface ElectronAPI {
     openExternal: (url: string) => void;
     openUrlHtml: (platform: string, query: string) => void;
+    showWebviewContextMenu: (payload: {
+        webContentsId: number;
+        currentUrl: string | null;
+        canCopy: boolean;
+        canPaste: boolean;
+    }) => void;
     setTheme: (source: "system" | "light" | "dark") => void;
     loadHist: () => unknown[];
     saveHist: (history: unknown[]) => void;

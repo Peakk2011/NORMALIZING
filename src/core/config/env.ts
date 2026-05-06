@@ -1,9 +1,8 @@
 import { pathToFileURL } from "node:url";
 import path from "node:path";
 
-const distDir = path.resolve(process.cwd(), "dist");
-
 export const isDev = Boolean(process.env.VITE_DEV_SERVER_URL);
+const distDir = __dirname;
 export const rendererUrl = process.env.VITE_DEV_SERVER_URL
     ?? pathToFileURL(path.join(distDir, "renderer/index.html")).toString();
 export const preloadPath = path.join(distDir, "preload.js");

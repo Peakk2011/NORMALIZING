@@ -11,7 +11,7 @@ export const detectEnv = (): PreloadEnv => {
     const isMac = ua.includes("mac");
     const isWindows = ua.includes("win");
     const isLinux = ua.includes("linux");
-    const isElectron = ua.includes("electron");
+    const isElectron = typeof process !== "undefined" && Boolean(process.versions?.electron);
 
     return {
         platform: isMac ? "mac" : isWindows ? "windows" : isLinux ? "linux" : "unknown",

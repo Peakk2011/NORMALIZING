@@ -2,8 +2,18 @@ import { openSidebar, closeSidebar, toggleSidebar } from './dom.js';
 import { openSearchModal, closeSearchModal, initSearchModal } from '../modal/modal.js';
 import { clearSearchInput } from '../modal/dom.js';
 import { renderHistory } from '../history/history.js';
-import { setActiveSearchHistory } from '../../../search/search.js';
+import { clearSearchHistory, getSearchHistory, setActiveSearchHistory } from '../../../search/search.js';
+import type { Platform } from '../../../data/usrspace.js';
 import { getThemePreference, setThemePreference, type ThemePreference } from '../../theme.js';
+import {
+    applyCompactSidebarPreference,
+    getCompactSidebarPreference,
+    getDefaultPlatform,
+    getRestoreSidebarPreference,
+    setCompactSidebarPreference,
+    setDefaultPlatform,
+    setRestoreSidebarPreference,
+} from '../../settings.js';
 
 const isUrlPage = window.location.pathname.includes('url.html');
 const SIDEBAR_STATE_KEY = 'sidebarOpenState';
@@ -19,7 +29,7 @@ const saveSidebarState = (isOpen: boolean): void => {
 const getSidebarState = (): boolean => {
     try {
         const stored = localStorage.getItem(SIDEBAR_STATE_KEY);
-        return stored === 'true' && window.innerWidth > 768;
+        return getRestoreSidebarPreference() && stored === 'true' && window.innerWidth > 768;
     } catch {
         return false;
     }
@@ -37,11 +47,17 @@ const resolveElements = () => {
     const settingsBtn = document.getElementById('sidebar-settings-btn') as HTMLButtonElement | null;
     const settingsModal = document.getElementById('settings-modal') as HTMLElement | null;
     const settingsClose = document.getElementById('settings-modal-close') as HTMLButtonElement | null;
+    const restoreSidebarToggle = document.getElementById('settings-restore-sidebar-toggle') as HTMLInputElement | null;
+    const compactSidebarToggle = document.getElementById('settings-compact-sidebar-toggle') as HTMLInputElement | null;
+    const historySummary = document.getElementById('settings-history-summary') as HTMLElement | null;
+    const clearRecentBtn = document.getElementById('settings-clear-recent-btn') as HTMLButtonElement | null;
+    const clearAllHistoryBtn = document.getElementById('settings-clear-all-history-btn') as HTMLButtonElement | null;
 
     if (
         !sidebarToggle || !sidebar || !sidebarClose || !searchBtn ||
         !newBtn || !historyList || !modal || !modalClose || !modalQueryInput ||
-        !settingsBtn || !settingsModal || !settingsClose
+        !settingsBtn || !settingsModal || !settingsClose || !restoreSidebarToggle ||
+        !compactSidebarToggle || !historySummary || !clearRecentBtn || !clearAllHistoryBtn
     ) return null;
 
     return {
@@ -57,6 +73,11 @@ const resolveElements = () => {
         settingsBtn,
         settingsModal,
         settingsClose,
+        restoreSidebarToggle,
+        compactSidebarToggle,
+        historySummary,
+        clearRecentBtn,
+        clearAllHistoryBtn,
     };
 };
 
@@ -77,14 +98,21 @@ const initSidebar = (): void => {
         settingsBtn,
         settingsModal,
         settingsClose,
+        restoreSidebarToggle,
+        compactSidebarToggle,
+        historySummary,
+        clearRecentBtn,
+        clearAllHistoryBtn,
     } = els;
     const modalOverlay = modal.querySelector('[data-close="true"]') as HTMLElement | null;
     const settingsOverlay = settingsModal.querySelector('[data-settings-close="true"]') as HTMLElement | null;
     const settingsTabs = Array.from(settingsModal.querySelectorAll<HTMLButtonElement>('[data-settings-tab]'));
     const settingsPanels = Array.from(settingsModal.querySelectorAll<HTMLElement>('[data-settings-panel]'));
     const themeButtons = Array.from(settingsModal.querySelectorAll<HTMLButtonElement>('[data-theme-choice]'));
+    const defaultPlatformButtons = Array.from(settingsModal.querySelectorAll<HTMLButtonElement>('[data-default-platform]'));
 
     const menuState = { current: null as HTMLElement | null };
+    let activeSettingsTab = 'general';
 
     const closeOpenMenu = (): void => {
         if (menuState.current) {
@@ -94,7 +122,17 @@ const initSidebar = (): void => {
     };
 
     const refresh = (): void => renderHistory(historyList, sidebar, menuState, closeOpenMenu, refresh);
+    const syncHistorySummary = (): void => {
+        const history = getSearchHistory();
+        const pinnedCount = history.filter(item => item.pinned).length;
+        const recentCount = history.length - pinnedCount;
+        historySummary.textContent = `${recentCount} recent item${recentCount === 1 ? '' : 's'} and ${pinnedCount} pinned item${pinnedCount === 1 ? '' : 's'}.`;
+    };
     const setActiveSettingsTab = (tab: string): void => {
+        const currentIndex = settingsTabs.findIndex(btn => btn.dataset.settingsTab === activeSettingsTab);
+        const nextIndex = settingsTabs.findIndex(btn => btn.dataset.settingsTab === tab);
+        const motion = nextIndex >= currentIndex ? 'up' : 'down';
+
         settingsTabs.forEach((btn) => {
             const active = btn.dataset.settingsTab === tab;
             btn.classList.toggle('is-active', active);
@@ -102,8 +140,10 @@ const initSidebar = (): void => {
         });
         settingsPanels.forEach((panel) => {
             const active = panel.dataset.settingsPanel === tab;
+            panel.dataset.motion = motion;
             panel.classList.toggle('is-active', active);
         });
+        activeSettingsTab = tab;
     };
     const syncThemeSelection = (): void => {
         const pref = getThemePreference();
@@ -112,12 +152,25 @@ const initSidebar = (): void => {
             btn.classList.toggle('is-active', isActive);
         });
     };
+    const syncDefaultPlatformSelection = (): void => {
+        const nextDefault = getDefaultPlatform();
+        defaultPlatformButtons.forEach((btn) => {
+            btn.classList.toggle('is-active', btn.dataset.defaultPlatform === nextDefault);
+        });
+    };
+    const syncSettingsState = (): void => {
+        restoreSidebarToggle.checked = getRestoreSidebarPreference();
+        compactSidebarToggle.checked = getCompactSidebarPreference();
+        syncThemeSelection();
+        syncDefaultPlatformSelection();
+        syncHistorySummary();
+    };
     const openSettingsModal = (): void => {
         settingsModal.classList.remove('u-hidden');
         settingsModal.classList.add('is-visible');
         settingsModal.setAttribute('aria-hidden', 'false');
-        setActiveSettingsTab('interface');
-        syncThemeSelection();
+        setActiveSettingsTab(activeSettingsTab);
+        syncSettingsState();
     };
     const closeSettingsModal = (): void => {
         settingsModal.classList.remove('is-visible');
@@ -170,7 +223,7 @@ const initSidebar = (): void => {
     });
     settingsTabs.forEach((tab) => {
         tab.addEventListener('click', () => {
-            setActiveSettingsTab(tab.dataset.settingsTab ?? 'interface');
+            setActiveSettingsTab(tab.dataset.settingsTab ?? 'general');
         });
     });
     themeButtons.forEach((btn) => {
@@ -180,8 +233,36 @@ const initSidebar = (): void => {
             syncThemeSelection();
         });
     });
+    defaultPlatformButtons.forEach((btn) => {
+        btn.addEventListener('click', () => {
+            const next = (btn.dataset.defaultPlatform ?? 'google') as Platform;
+            setDefaultPlatform(next);
+            syncDefaultPlatformSelection();
+        });
+    });
+    restoreSidebarToggle.addEventListener('change', () => {
+        setRestoreSidebarPreference(restoreSidebarToggle.checked);
+        if (!restoreSidebarToggle.checked) {
+            saveSidebarState(false);
+        }
+    });
+    compactSidebarToggle.addEventListener('change', () => {
+        setCompactSidebarPreference(compactSidebarToggle.checked);
+        applyCompactSidebarPreference();
+    });
+    clearRecentBtn.addEventListener('click', () => {
+        clearSearchHistory(true);
+        syncHistorySummary();
+        refresh();
+    });
+    clearAllHistoryBtn.addEventListener('click', () => {
+        clearSearchHistory(false);
+        syncHistorySummary();
+        refresh();
+    });
 
     const isCompactScreen = (): boolean => window.innerWidth <= 768;
+    applyCompactSidebarPreference();
 
     document.addEventListener('click', (event: MouseEvent) => {
         const target = event.target as Node | null;
@@ -212,6 +293,7 @@ const initSidebar = (): void => {
         openSidebar(sidebar, refresh);
     }
 
+    syncSettingsState();
     refresh();
 };
 

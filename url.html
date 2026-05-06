@@ -8,6 +8,7 @@
     <title>Search Results</title>
     <link rel="stylesheet" href="/src/renderer/stylesheet/base.css">
     <link rel="stylesheet" href="/src/renderer/stylesheet/url.css">
+    <link rel="stylesheet" href="/src/visualizer/visualizer.css">
 </head>
 
 <body>
@@ -22,6 +23,12 @@
                     <path d="M400-80 0-480l400-400 71 71-329 329 329 329-71 71Z" />
                 </svg>
             </button>
+            <button class="c-refresh-btn" id="refresh-btn" type="button" aria-label="Refresh current page">
+                <svg xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 -960 960 960" width="18px"
+                    fill="currentcolor">
+                    <path d="M480-160q-134 0-227-93t-93-227q0-134 93-227t227-93q69 0 129 28.5T714-694v-106h80v280H514v-80h152q-35-55-88-87.5T480-720q-100 0-170 70t-70 170q0 100 70 170t170 70q77 0 138.5-42.5T704-400h84q-20 107-100 173.5T480-160Z" />
+                </svg>
+            </button>
             <button id="sidebar-toggle-btn" class="c-sidebar-toggle" type="button" aria-label="Open history sidebar">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentcolor">
                     <path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
@@ -31,26 +38,7 @@
 
         <input type="text" id="search-title-input" class="c-search-title" placeholder="Search or paste URL" autocomplete="off" />
 
-        <div class="c-menu">
-            <button class="c-menu-btn c-menu-btn-url" id="menu-btn">
-                <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px"
-                    fill="currentcolor">
-                    <path
-                        d="M480-160q-33 0-56.5-23.5T400-240q0-33 23.5-56.5T480-320q33 0 56.5 23.5T560-240q0 33-23.5 56.5T480-160Zm0-240q-33 0-56.5-23.5T400-480q0-33 23.5-56.5T480-560q33 0 56.5 23.5T560-480q0 33-23.5 56.5T480-400Zm0-240q-33 0-56.5-23.5T400-720q0-33 23.5-56.5T480-800q33 0 56.5 23.5T560-720q0 33-23.5 56.5T480-640Z" />
-                </svg>
-            </button>
-
-            <div class="c-platform-dropdown u-hidden" id="platform-menu">
-                <button class="google" data-platform="google"
-                    style="border-top-right-radius: 4px; border-top-left-radius: 4px;">Google</button>
-                <button class="youtube" data-platform="youtube">YouTube</button>
-                <button class="threads" data-platform="threads">Threads</button>
-                <button class="instagram" data-platform="instagram">Instagram</button>
-                <button class="facebook" data-platform="facebook">Facebook</button>
-                <button class="github" data-platform="github">GitHub</button>
-                <button class="pinterest" data-platform="pinterest"
-                    style="border-bottom-right-radius: 4px; border-bottom-left-radius: 4px;">Pinterest</button>
-            </div>
+        <div class="c-url-actions">
         </div>
     </div>
 

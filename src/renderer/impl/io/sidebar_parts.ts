@@ -46,26 +46,106 @@ const sidebarPartsHtml = `
 
     <div id="settings-modal" class="c-settings-modal u-hidden" aria-hidden="true" role="dialog" aria-modal="true">
         <div class="c-settings-overlay" data-settings-close="true"></div>
-        <div class="c-settings-panel">
+            <div class="c-settings-panel">
+            <div class='c-settings-modal-titlebar'>
+                <h1>Settings</h1>
+            </div>
             <div class="c-settings-header">
                 <div class="c-settings-menu-bar" role="tablist" aria-label="Settings sections">
-                    <button class="c-settings-menu-btn is-active" type="button" role="tab" aria-selected="true" data-settings-tab="interface">Interface</button>
-                    <!-- <button class="c-settings-menu-btn" type="button" role="tab" aria-selected="false" data-settings-tab="layout">Layout</button> -->
+                    <button class="c-settings-menu-btn is-active" type="button" role="tab" aria-selected="true" data-settings-tab="general">General</button>
+                    <button class="c-settings-menu-btn" type="button" role="tab" aria-selected="false" data-settings-tab="styling">Styling</button>
+                    <button class="c-settings-menu-btn" type="button" role="tab" aria-selected="false" data-settings-tab="search">Search</button>
+                    <button class="c-settings-menu-btn" type="button" role="tab" aria-selected="false" data-settings-tab="history">History</button>
+                    <button class="c-settings-menu-btn" type="button" role="tab" aria-selected="false" data-settings-tab="about">About</button>
                 </div>
-                <button id="settings-modal-close" class="c-settings-close" type="button" aria-label="Close settings dialog"><span>×</span></button>
+                <button id="settings-modal-close" class="c-settings-close" type="button" aria-label="Close settings dialog"><span>&times;</span></button>
             </div>
             <div class="c-settings-body">
-                <section class="c-settings-section is-active" data-settings-panel="interface">
-                    <h3>Theme</h3>
+                <section class="c-settings-section is-active" data-settings-panel="general" data-motion="up">
+                    <div class="c-settings-row">
+                        <div class="c-settings-copy">
+                            <h4>Restore Sidebar</h4>
+                            <p>Restore the sidebar automatically on larger screens.</p>
+                        </div>
+                        <label class="c-settings-switch">
+                            <input id="settings-restore-sidebar-toggle" type="checkbox" />
+                            <span class="c-settings-switch-ui"></span>
+                        </label>
+                    </div>
+                    <div class="c-settings-row">
+                        <div class="c-settings-copy">
+                            <h4>Language</h4>
+                            <p>Additional languages will be added later.</p>
+                        </div>
+                    </div>
+                    <div class="c-settings-chip-row">
+                        <span class="c-settings-chip is-active">English</span>
+                        <span class="c-settings-chip">Thai soon</span>
+                    </div>
+                </section>
+                <section class="c-settings-section" data-settings-panel="styling" data-motion="up">
+                    <div class="c-settings-row c-settings-row-stack">
+                        <div class="c-settings-copy">
+                            <h4>Theme</h4>
+                            <p>Choose how Normalizing should look.</p>
+                        </div>
+                    </div>
                     <div class="c-theme-choice-list">
-                        <button class="c-theme-choice-btn" type="button" data-theme-choice="system">System</button>
                         <button class="c-theme-choice-btn" type="button" data-theme-choice="light">Light</button>
                         <button class="c-theme-choice-btn" type="button" data-theme-choice="dark">Dark</button>
                     </div>
+                    <div class="c-settings-row">
+                        <div class="c-settings-copy">
+                            <h4>Compact Sidebar</h4>
+                            <p>Use a tighter sidebar layout on screens wider than 768px.</p>
+                        </div>
+                        <label class="c-settings-switch">
+                            <input id="settings-compact-sidebar-toggle" type="checkbox" />
+                            <span class="c-settings-switch-ui"></span>
+                        </label>
+                    </div>
                 </section>
-                <section class="c-settings-section" data-settings-panel="layout">
-                    <h3>Layout</h3>
-                    <p>Layout settings will be available soon.</p>
+                <section class="c-settings-section" data-settings-panel="search" data-motion="up">
+                    <div class="c-settings-row c-settings-row-stack">
+                        <div class="c-settings-copy">
+                            <h4>Default Platform</h4>
+                            <p>Used when you press Enter from the main search input.</p>
+                        </div>
+                    </div>
+                    <div class="c-settings-search-platforms">
+                        <button class="c-settings-chip c-settings-platform-btn" type="button" data-default-platform="google">Google</button>
+                        <button class="c-settings-chip c-settings-platform-btn" type="button" data-default-platform="youtube">YouTube</button>
+                        <button class="c-settings-chip c-settings-platform-btn" type="button" data-default-platform="threads">Threads</button>
+                        <button class="c-settings-chip c-settings-platform-btn" type="button" data-default-platform="instagram">Instagram</button>
+                        <button class="c-settings-chip c-settings-platform-btn" type="button" data-default-platform="facebook">Facebook</button>
+                        <button class="c-settings-chip c-settings-platform-btn" type="button" data-default-platform="github">GitHub</button>
+                        <button class="c-settings-chip c-settings-platform-btn" type="button" data-default-platform="pinterest">Pinterest</button>
+                    </div>
+                </section>
+                <section class="c-settings-section" data-settings-panel="history" data-motion="up">
+                    <div class="c-settings-row c-settings-row-stack">
+                        <div class="c-settings-copy">
+                            <h4>Recent Searches</h4>
+                            <p id="settings-history-summary">Manage your recent and pinned search items.</p>
+                        </div>
+                    </div>
+                    <div class="c-settings-chip-row">
+                        <button id="settings-clear-recent-btn" class="c-settings-chip c-settings-action-pill" type="button">Clear Recent</button>
+                        <button id="settings-clear-all-history-btn" class="c-settings-chip c-settings-action-pill is-danger" type="button">Clear All</button>
+                    </div>
+                </section>
+                <section class="c-settings-section" data-settings-panel="about" data-motion="up">
+                    <div class="c-settings-row c-settings-row-stack">
+                        <div class="c-settings-copy c-settings-about-copy">
+                            <img src="./assets/logo/application_icon.png" alt="Normalizing app icon" class="c-settings-about-icon">
+                            <h4>NORMALIZING</h4>
+                            <p>Version 1.0.0</p>
+                            <div class="c-settings-about-links">
+                                <a class="c-settings-about-link" href="https://github.com/Peakk2011/NORMALIZING" target="_blank" rel="noreferrer">An app created by Peakk</a>
+                                <a class="c-settings-about-link" href="https://github.com/Peakk2011/NORMALIZING/releases/tag/1.0.0" target="_blank" rel="noreferrer">View release and project details</a>
+                            </div>
+                        </div>
+                    </div>
                 </section>
             </div>
         </div>

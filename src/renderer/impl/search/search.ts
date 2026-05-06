@@ -204,6 +204,19 @@ export const deleteSearchHistory = (record: HistoryRecord): void => {
     saveSearchHistory(history);
 };
 
+export const clearSearchHistory = (preservePinned = false): void => {
+    const nextHistory = preservePinned
+        ? getSearchHistory().filter(item => Boolean(item.pinned))
+        : [];
+
+    const activeKey = getActiveSearchHistoryKey();
+    if (activeKey && !nextHistory.some(item => getHistoryRecordKey(item) === activeKey)) {
+        setActiveSearchHistory(null);
+    }
+
+    saveSearchHistory(nextHistory);
+};
+
 export const toggleSearchHistoryPinned = (record: HistoryRecord): void => {
     const history = getSearchHistory().map(item => {
         if (item.platform === record.platform && item.query === record.query) {
@@ -262,7 +275,8 @@ const search = (platform: Platform, queryOverride?: string): void => {
     recordSearchHistory(historyPlatform, query);
 
     const env: NormalizingEnv | undefined = window.env ?? window.__normalizingEnv;
-    if (env?.isWeb) {
+    const shouldUseDirectNavigation = env?.isWeb ?? !window.electronAPI;
+    if (shouldUseDirectNavigation) {
         window.location.href = url;
     } else {
         const urlHtmlUrl = directUrl

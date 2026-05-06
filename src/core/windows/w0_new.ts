@@ -1,4 +1,3 @@
-import { createRequire } from "node:module";
 import path from "node:path";
 
 import type {
@@ -7,14 +6,14 @@ import type {
     TitleBarOverlayOptions
 } from "electron";
 
+import { BrowserWindow, nativeImage, nativeTheme } from "electron";
 import { isDev, preloadPath } from "../config/env.js";
-
-const requireFromAppRoot = createRequire(path.resolve(process.cwd(), "package.json"));
-const { BrowserWindow, nativeImage, nativeTheme } = requireFromAppRoot("electron") as typeof import("electron");
 
 // Resolve the correct icon format per platform
 const getIconPath = (): string => {
-    const base = path.resolve(process.cwd(), "assets", "logo", "app_icons");
+    const base = isDev
+        ? path.resolve(process.cwd(), "assets", "logo", "app_icons")
+        : path.join(process.resourcesPath, "assets", "logo", "app_icons");
     if (process.platform === "darwin") return path.join(base, "application_icon.icns");
     if (process.platform === "win32") return path.join(base, "application_icon.ico");
     return path.join(base, "application_icon.png");
@@ -32,7 +31,7 @@ const isHttpUrl = (value: string): boolean => {
 const getTitleBarOverlay = (): TitleBarOverlayOptions => ({
     color: "#ffffff00",
     symbolColor: nativeTheme.shouldUseDarkColors ? "#ffffff" : "#000000",
-    height: 34,
+    height: 38,
 });
 
 const titlebarOverlayWin = (win: ElectronBrowserWindow): void => {
@@ -71,6 +70,9 @@ export const createWindow = (url: string, width = 900, height = 780): ElectronBr
     };
 
     const win = new BrowserWindow(windowOptions);
+    win.setMenuBarVisibility(false);
+    win.removeMenu();
+
     const syncTitleBarOverlay = (): void => {
         if (!win.isDestroyed()) {
             win.setTitleBarOverlay(getTitleBarOverlay());
@@ -85,7 +87,32 @@ export const createWindow = (url: string, width = 900, height = 780): ElectronBr
         if (!isHttpUrl(targetUrl)) {
             return { action: "deny" };
         }
-        return { action: "allow" };
+        return {
+            action: "allow",
+            overrideBrowserWindowOptions: {
+                autoHideMenuBar: true,
+                titleBarStyle: "hidden",
+                titleBarOverlay: getTitleBarOverlay(),
+                backgroundColor: "#00ffffff",
+                webPreferences: {
+                    preload: preloadPath,
+                    contextIsolation: true,
+                    nodeIntegration: false,
+                    sandbox: true,
+                    spellcheck: false,
+                    backgroundThrottling: true,
+                    webviewTag: true,
+                    experimentalFeatures: false,
+                    disableBlinkFeatures: "CSSVariables,FontLoadingEvents",
+                    imageAnimationPolicy: "animateOnce",
+                },
+            },
+        };
+    });
+
+    win.webContents.on("did-create-window", (childWindow) => {
+        childWindow.setMenuBarVisibility(false);
+        childWindow.removeMenu();
     });
 
     win.webContents.on("will-attach-webview", (event, webPreferences, params) => {
@@ -102,9 +129,6 @@ export const createWindow = (url: string, width = 900, height = 780): ElectronBr
         webPreferences.webSecurity = true;
         webPreferences.allowRunningInsecureContent = false;
     });
-
-    // Clear session cache on every window creation to avoid stale data
-    void win.webContents.session.clearCache();
 
     // Open detached DevTools only in development
     if (isDev) {

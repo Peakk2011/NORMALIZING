@@ -26,7 +26,7 @@
             rgba(255, 255, 255, 0.3),
             rgba(255, 255, 255, 0.85) 70%,
             rgba(255, 255, 255, 0.95));
-    --theme-overlay: rgba(0, 0, 0, 0.25);
+    --theme-overlay: rgba(255, 255, 255, 0.25);
     --theme-overlay-soft: rgba(127, 127, 127, 0.08);
     --theme-border-contrast: rgba(255, 255, 255, 0.42);
     --theme-border-soft-alpha: rgba(17, 17, 17, 0.08);

@@ -6,6 +6,7 @@ import { isLikelyUrl, makeHref, recordSearchHistory } from './impl/search/search
 import initSidebar from './impl/io/sidebar.js';
 import { mountSidebarParts } from './impl/io/sidebar_parts.js';
 import { initTheme } from './impl/io/theme.js';
+import { getDefaultPlatform } from './impl/io/settings.js';
 import type { NormalizingEnv } from './types/window.js';
 import { Visualizer } from '../visualizer/visualizer.js';
 
@@ -13,7 +14,7 @@ const ua = navigator.userAgent.toLowerCase();
 const isMac     = ua.includes("mac");
 const isWindows = ua.includes("win");
 const isLinux   = ua.includes("linux");
-const isElectron = ua.includes("electron");
+const isElectron = Boolean(window.electronAPI) || ua.includes("electron");
 
 const env: NormalizingEnv = window.env ?? window.__normalizingEnv ?? {
     platform:   isMac ? "mac" : isWindows ? "windows" : isLinux ? "linux" : "unknown",
@@ -50,6 +51,7 @@ setWindowEnv(env);
 document.documentElement.classList.add(`platform-${env.platform}`);
 document.documentElement.classList.add(`runtime-${env.runtime}`);
 document.documentElement.classList.add(env.isDev ? "env-dev" : "env-prod");
+document.documentElement.classList.add("page-url");
 initTheme();
 
 interface SearchData {
@@ -65,6 +67,8 @@ function isValidPlatform(platform: string): platform is Platform {
 }
 
 let currentData: SearchData | null = null;
+let activeWebview: Electron.WebviewTag | null = null;
+let pendingExternalUrl: string | null = null;
 
 const getUrlErrorMessage = (query: string, detail?: string, errorCode?: number): string => {
     if (errorCode === -118) {
@@ -117,6 +121,76 @@ const openUrl = (url: string): void => {
     }
 };
 
+const getCurrentUrl = (): string | null => {
+    if (activeWebview && typeof activeWebview.getURL === 'function') {
+        const liveUrl = activeWebview.getURL();
+        if (liveUrl) return liveUrl;
+    }
+    if (!currentData) return null;
+    return currentData.url;
+};
+
+const setRefreshLoadingState = (isLoading: boolean): void => {
+    const refreshBtn = document.getElementById('refresh-btn') as HTMLButtonElement | null;
+    if (!refreshBtn) return;
+
+    refreshBtn.classList.toggle('is-loading', isLoading);
+    refreshBtn.disabled = isLoading;
+    refreshBtn.setAttribute('aria-busy', String(isLoading));
+};
+
+const initWebview = (webview: Electron.WebviewTag): void => {
+    if (activeWebview === webview) return;
+    activeWebview = webview;
+
+    webview.addEventListener('did-start-loading', () => {
+        setRefreshLoadingState(true);
+    });
+
+    webview.addEventListener('did-stop-loading', () => {
+        setRefreshLoadingState(false);
+    });
+
+    webview.addEventListener('did-fail-load', (event: Event) => {
+        const failEvent = event as Electron.DidFailLoadEvent;
+        if (failEvent.errorCode === -3) {
+            return;
+        }
+
+        setRefreshLoadingState(false);
+        const label = currentData?.query ?? pendingExternalUrl ?? webview.src;
+        void Visualizer({
+            title: 'This URL could not be opened.',
+            message: getUrlErrorMessage(label, failEvent.errorDescription, failEvent.errorCode),
+        }).then(() => {
+            window.location.href = 'index.html';
+        });
+    });
+
+    webview.addEventListener('new-window', (event: any) => {
+        event.preventDefault();
+        const newUrl = event.url;
+        if (newUrl && newUrl !== 'about:blank') {
+            const params = new URLSearchParams();
+            params.set('target', newUrl);
+            params.set('query', newUrl);
+            window.location.href = `url.html?${params.toString()}`;
+        }
+    });
+
+    webview.addEventListener('context-menu', (event: any) => {
+        if (!window.electronAPI?.showWebviewContextMenu) return;
+
+        const params = event.params ?? {};
+        window.electronAPI.showWebviewContextMenu({
+            webContentsId: webview.getWebContentsId(),
+            currentUrl: getCurrentUrl(),
+            canCopy: Boolean(params.selectionText) || Boolean(params.editFlags?.canCopy),
+            canPaste: Boolean(params.isEditable) || Boolean(params.editFlags?.canPaste),
+        });
+    });
+};
+
 const loadResult = (url: string): void => {
     try {
         new URL(url);
@@ -135,36 +209,8 @@ const loadResult = (url: string): void => {
         openUrl(url);
         return;
     }
-
-    const handleFailLoad = (event: Electron.DidFailLoadEvent): void => {
-        webview.removeEventListener('did-fail-load', handleFailLoad as EventListener);
-        if (event.errorCode === -3) {
-            return;
-        }
-        const label = currentData?.query ?? url;
-        void Visualizer({
-            title: 'This URL could not be opened.',
-            message: getUrlErrorMessage(label, event.errorDescription, event.errorCode),
-        }).then(() => {
-            window.location.href = 'index.html';
-        });
-    };
-
-    webview.addEventListener('did-fail-load', handleFailLoad as EventListener);
-
-    // Handle window.open from webview
-    webview.addEventListener('new-window', (event: any) => {
-        event.preventDefault();
-        // Open in new history instead of external browser
-        const newUrl = event.url;
-        if (newUrl && newUrl !== 'about:blank') {
-            const params = new URLSearchParams();
-            params.set('target', newUrl);
-            params.set('query', newUrl);
-            window.location.href = `url.html?${params.toString()}`;
-        }
-    });
-
+    initWebview(webview);
+    pendingExternalUrl = url;
     webview.src = url;
 };
 
@@ -206,12 +252,41 @@ const searchAgain = (platform: Platform): void => {
     }
 };
 
+const refreshCurrentResult = (): void => {
+    const currentUrl = getCurrentUrl();
+    if (!currentUrl) return;
+
+    if (env.isWeb) {
+        window.location.href = currentUrl;
+        return;
+    }
+
+    const webview = document.getElementById('result-frame') as Electron.WebviewTag | null;
+    if (webview) {
+        setRefreshLoadingState(true);
+        webview.reload();
+        return;
+    }
+
+    loadResult(currentUrl);
+};
+
+const updateActiveHistoryQueryPreview = (query: string): void => {
+    const activeHistoryQuery = document.querySelector('.c-history-item.is-active .c-history-query') as HTMLSpanElement | null;
+    if (!activeHistoryQuery) return;
+
+    const nextLabel = query || 'Untitled';
+    activeHistoryQuery.textContent = nextLabel;
+    activeHistoryQuery.title = nextLabel;
+};
+
 const initHeader = (): void => {
     const searchTitle = document.getElementById('search-title-input') as HTMLInputElement | null;
     if (!searchTitle || !currentData) return;
 
     searchTitle.value = currentData.query;
     searchTitle.title = currentData.query;
+    updateActiveHistoryQueryPreview(currentData.query);
 
     const updateUrlStyle = (): void => {
         if (isLikelyUrl(searchTitle.value)) {
@@ -221,13 +296,20 @@ const initHeader = (): void => {
         }
     };
 
+    const syncQueryPreview = (query: string): void => {
+        if (!currentData) return;
+        currentData = { ...currentData, query };
+        searchTitle.title = query;
+        updateActiveHistoryQueryPreview(query);
+    };
+
     const performSearch = (): void => {
         const query = searchTitle.value.trim();
         if (!query || !currentData) return;
 
-        currentData = { ...currentData, query };
+        syncQueryPreview(query);
         const directUrl = isLikelyUrl(query);
-        const nextPlatform = directUrl ? null : (currentData.platform ?? 'google');
+        const nextPlatform = directUrl ? null : (currentData.platform ?? getDefaultPlatform());
         const url = directUrl
             ? makeHref(query)
             : mkReqUrl(nextPlatform as Platform, query);
@@ -239,7 +321,11 @@ const initHeader = (): void => {
         }
     };
 
-    searchTitle.addEventListener('input', updateUrlStyle);
+    searchTitle.addEventListener('input', () => {
+        const query = searchTitle.value.trim();
+        updateUrlStyle();
+        syncQueryPreview(query);
+    });
     searchTitle.addEventListener('keydown', (event: KeyboardEvent) => {
         if (event.key === 'Enter') {
             event.preventDefault();
@@ -272,46 +358,6 @@ const initHeader = (): void => {
     }
 };
 
-const initMenu = (): void => {
-    const menuBtn      = document.getElementById('menu-btn');
-    const platformMenu = document.getElementById('platform-menu');
-
-    if (!menuBtn || !platformMenu) return;
-
-    const onMenuClick = (e: Event) => {
-        e.stopPropagation();
-        platformMenu.classList.toggle('u-hidden');
-    };
-
-    const onDocumentClick = (e: Event) => {
-        if (!platformMenu.contains(e.target as Node)) {
-            platformMenu.classList.add('u-hidden');
-        }
-    };
-
-    const onPlatformClick = (e: Event) => {
-        const button = (e.target as HTMLElement).closest('button');
-        if (!button) return;
-
-        const platform = button.getAttribute('data-platform');
-        if (!platform || !isValidPlatform(platform)) return;
-
-        searchAgain(platform);
-        platformMenu.classList.add('u-hidden');
-    };
-
-    menuBtn.addEventListener('click', onMenuClick);
-    document.addEventListener('click', onDocumentClick);
-    platformMenu.addEventListener('click', onPlatformClick);
-
-    // Cleanup on unload
-    window.addEventListener('beforeunload', () => {
-        menuBtn.removeEventListener('click', onMenuClick);
-        document.removeEventListener('click', onDocumentClick);
-        platformMenu.removeEventListener('click', onPlatformClick);
-    });
-};
-
 document.addEventListener('DOMContentLoaded', () => {
     mountSidebarParts();
     initSidebar();
@@ -325,6 +371,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const backBtn = document.getElementById('back-btn');
     backBtn?.addEventListener('click', goBack);
-
-    initMenu();
 });

@@ -37,6 +37,17 @@ export const openUrlWindow = (platform: string, query: string): void => {
     urlViewWindows.set(windowKey, newWin);
 };
 
+export const openDirectUrlWindow = (url: string): void => {
+    const newWin = createWindow(url, 900, 780);
+    newWin.on("closed", () => {
+        for (const [key, value] of urlViewWindows.entries()) {
+            if (value === newWin) {
+                urlViewWindows.delete(key);
+            }
+        }
+    });
+};
+
 export const createMainWindow = (): BrowserWindow => {
     const win = createWindow(rendererUrl, 900, 780);
     mainWindow = win;

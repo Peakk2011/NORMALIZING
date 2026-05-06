@@ -25,7 +25,7 @@ export const historyItemMenuToggleHtml = `
 `;
 
 const historyItemMenuHtml = (): string => `
-    <button type="button" class="c-history-item-menu-btn" data-action="copy" style='border-top-right-radius: 4px; border-top-left-radius: 4px;'>
+    <button type="button" class="c-history-item-menu-btn is-first" data-action="copy">
         <span>Copy URL</span>
     </button>
     <!--
@@ -36,7 +36,7 @@ const historyItemMenuHtml = (): string => `
     <button type="button" class="c-history-item-menu-btn" data-action="rename">
         <span>Edit Search</span>
     </button>
-    <button type="button" class="c-history-item-menu-btn" data-action="delete" style='border-bottom-right-radius: 4px; border-bottom-left-radius: 4px;'>
+    <button type="button" class="c-history-item-menu-btn is-last" data-action="delete">
         <span>Delete</span>
     </button>
 `;

@@ -16,15 +16,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Inject platform classes
     const root = document.documentElement;
+    const isElectronRuntime = Boolean(window.electronAPI) || navigator.userAgent.toLowerCase().includes("electron");
     
     const env: NormalizingEnv = window.env ?? window.__normalizingEnv ?? {
         platform: navigator.userAgent.toLowerCase().includes("win") ? "windows"
                 : navigator.userAgent.toLowerCase().includes("mac") ? "mac"
                 : navigator.userAgent.toLowerCase().includes("linux") ? "linux"
                 : "unknown",
-        runtime: "web",
-        isElectron: false,
-        isWeb: true,
+        runtime: isElectronRuntime ? "electron" : "web",
+        isElectron: isElectronRuntime,
+        isWeb: !isElectronRuntime,
         isDev: location.hostname === "localhost" || location.hostname === "127.0.0.1",
     };
 
@@ -55,6 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
     root.classList.add(`platform-${env.platform}`);
     root.classList.add(`runtime-${env.runtime}`);
     root.classList.add(env.isDev ? "env-dev" : "env-prod");
+    root.classList.add("page-index");
     initTheme();
 
     console.log('window.env:', window.env);

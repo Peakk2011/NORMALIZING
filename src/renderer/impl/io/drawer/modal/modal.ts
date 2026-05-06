@@ -1,6 +1,7 @@
 /// <reference types="electron" />
 
 import { focusModalInput, searchInPage } from './dom.js';
+import { Visualizer } from '../../../../../visualizer/visualizer.js';
 
 export const openSearchModal = (modal: HTMLElement, modalQueryInput: HTMLTextAreaElement): void => {
     const pageInput = document.getElementById('query-input') as HTMLTextAreaElement | null;
@@ -54,7 +55,7 @@ export const initSearchModal = (
             modalQueryInput.focus();
             return;
         }
-        searchInPage(query);
+        void searchInPage(query);
     };
 
     modalFind?.addEventListener('click', () => {
@@ -104,4 +105,29 @@ export const initSearchModal = (
             openSearchModal(modal, modalQueryInput);
         }
     });
+
+    const loveQueries = new Set(['รัก', 'คิดถึง', 'หึง', 'เป็นห่วง', 'ไว้ใจ']);
+
+    window.addEventListener('normalizing:find-result', ((event: Event) => {
+        if (modal.getAttribute('aria-hidden') !== 'false') return;
+
+        const customEvent = event as CustomEvent<{ query?: string; matches?: number }>;
+        const query = customEvent.detail?.query?.trim();
+        const matches = Number(customEvent.detail?.matches ?? 0);
+
+        if (!query || matches > 0) return;
+
+        let title: string;
+        if (query === 'มนุษย์') {
+            title = 'ไม่เจอ มนุษย์ ผู้ที่เป็นคนแสนวิเศษ ผู้ที่ไม่เพลิดเพลินใจกับตน';
+        } else if (loveQueries.has(query)) {
+            title = `ไม่เจอความ "${query}" โปรดหาคนรัก`;
+        } else {
+            title = `Not found "${query}" try again.`;
+        }
+
+        void Visualizer({
+            title,
+        });
+    }) as EventListener);
 };
