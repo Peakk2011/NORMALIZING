@@ -1,3 +1,5 @@
+const appIconUrl = new URL('../../../../assets/logo/application_icon.png', import.meta.url).href;
+
 const sidebarPartsHtml = `
     <aside id="history-sidebar" class="c-history-sidebar u-hidden" aria-hidden="true">
         <div class="c-sidebar-header">
@@ -137,7 +139,7 @@ const sidebarPartsHtml = `
                 <section class="c-settings-section" data-settings-panel="about" data-motion="up">
                     <div class="c-settings-row c-settings-row-stack">
                         <div class="c-settings-copy c-settings-about-copy">
-                            <img src="./assets/logo/application_icon.png" alt="Normalizing app icon" class="c-settings-about-icon">
+                            <img src="${appIconUrl}" alt="Normalizing app icon" class="c-settings-about-icon">
                             <h4>NORMALIZING</h4>
                             <p>Version 1.0.0</p>
                             <div class="c-settings-about-links">

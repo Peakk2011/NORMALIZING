@@ -8,7 +8,7 @@
     ".": "./dist/core/app/app_init.js"
   },
   "scripts": {
-    "build": "npm run build:ts && npm run build:main && npm run build:vite && npm run build:preload && npm run copy-html",
+    "build": "npm run build:ts && npm run build:main && npm run build:vite && npm run build:preload",
     "build:ts": "tsc",
     "build:main": "vite build --config vite.main.mjs",
     "build:vite": "vite build",
@@ -21,7 +21,7 @@
     "start": "npm run build && npx electron .",
     "start:dev": "set VITE_DEV_SERVER_URL=http://127.0.0.1:5173&& npx electron .",
     "normalizing": "concurrently -n TSC,VITE,ELECTRON \"npm run watch:ts\" \"npm run dev:vite\" \"wait-on http://127.0.0.1:5173 && set VITE_DEV_SERVER_URL=http://127.0.0.1:5173&& npx electron .\"",
-    "dist:win": "npm run build && electron-builder --win",
+    "dist:win": "npm run build && electron-builder --win --publish=never",
     "dist:mac": "npm run build && electron-builder --mac"
   },
   "keywords": [],
@@ -44,6 +44,10 @@
       "output": "release"
     },
     "extraResources": [
+      {
+        "from": "assets/logo/application_icon.png",
+        "to": "assets/logo/application_icon.png"
+      },
       {
         "from": "assets/logo/app_icons",
         "to": "assets/logo/app_icons"

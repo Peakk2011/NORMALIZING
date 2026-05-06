@@ -279,10 +279,17 @@ const search = (platform: Platform, queryOverride?: string): void => {
     if (shouldUseDirectNavigation) {
         window.location.href = url;
     } else {
-        const urlHtmlUrl = directUrl
-            ? `${window.location.origin}/url.html?target=${encodeURIComponent(query)}&query=${encodeURIComponent(query)}`
-            : `${window.location.origin}/url.html?platform=${encodeURIComponent(platform)}&query=${encodeURIComponent(query)}`;
-        window.location.href = urlHtmlUrl;
+        const urlHtmlUrl = new URL('url.html', window.location.href);
+    const params = new URLSearchParams();
+    if (directUrl) {
+        params.set('target', query);
+        params.set('query', query);
+    } else {
+        params.set('platform', platform);
+        params.set('query', query);
+    }
+    urlHtmlUrl.search = params.toString();
+    window.location.href = urlHtmlUrl.toString();
     }
 };
 

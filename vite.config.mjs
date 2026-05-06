@@ -23,5 +23,11 @@ export default defineConfig({
   build: {
     outDir: "dist/renderer",
     emptyOutDir: false,
+    rollupOptions: {
+      input: {
+        index: path.resolve(process.cwd(), "index.html"),
+        url: path.resolve(process.cwd(), "url.html"),
+      },
+    },
   },
 });
