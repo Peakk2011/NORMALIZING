@@ -1,14 +1,21 @@
-/// <reference types="electron" />
-
 import type { Platform } from './impl/data/usrspace.js';
 import mkReqUrl from './impl/search/mk_req_url.js';
-import { isLikelyUrl, makeHref, recordSearchHistory } from './impl/search/search.js';
+import {
+    isLikelyUrl,
+    makeHref,
+    recordSearchHistory,
+    setActiveSearchHistory,
+    deleteSearchHistory,
+    getActiveSearchHistoryKey,
+    getSearchHistory
+} from './impl/search/search.js';
 import initSidebar from './impl/io/sidebar.js';
 import { mountSidebarParts } from './impl/io/sidebar_parts.js';
 import { initTheme } from './impl/io/theme.js';
 import { getDefaultPlatform } from './impl/io/settings.js';
 import type { NormalizingEnv } from './types/window.js';
 import { Visualizer } from '../visualizer/visualizer.js';
+import { closeSidebar } from './impl/io/drawer/sidebar/dom.js';
 
 const ua = navigator.userAgent.toLowerCase();
 const isMac     = ua.includes("mac");
@@ -171,10 +178,7 @@ const initWebview = (webview: Electron.WebviewTag): void => {
         event.preventDefault();
         const newUrl = event.url;
         if (newUrl && newUrl !== 'about:blank') {
-            const params = new URLSearchParams();
-            params.set('target', newUrl);
-            params.set('query', newUrl);
-            window.location.href = `url.html?${params.toString()}`;
+            window.electronAPI?.openUrlHtml('direct', newUrl);
         }
     });
 
@@ -189,6 +193,20 @@ const initWebview = (webview: Electron.WebviewTag): void => {
             canPaste: Boolean(params.isEditable) || Boolean(params.editFlags?.canPaste),
         });
     });
+
+    const registerShortcut = (): void => {
+        if (!window.electronAPI?.registerWebviewShortcut) return;
+        const webContentsId = webview.getWebContentsId();
+        if (typeof webContentsId === 'number' && webContentsId > 0) {
+            window.electronAPI.registerWebviewShortcut(webContentsId);
+        }
+    };
+
+    webview.addEventListener('dom-ready', () => {
+        registerShortcut();
+    });
+
+    registerShortcut();
 };
 
 const loadResult = (url: string): void => {
@@ -368,6 +386,42 @@ document.addEventListener('DOMContentLoaded', () => {
     loadResult(currentData.url);
 
     initHeader();
+
+    const handleCloseTab = (): void => {
+        const activeKey = getActiveSearchHistoryKey();
+        if (activeKey) {
+            const history = getSearchHistory();
+            const record = history.find(item => `${item.platform}::${item.query}` === activeKey);
+            if (record) {
+                deleteSearchHistory(record);
+            }
+        }
+        setActiveSearchHistory(null);
+        const sidebar = document.getElementById('history-sidebar') as HTMLElement | null;
+        if (sidebar && !sidebar.classList.contains('u-hidden')) {
+            closeSidebar(sidebar);
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 220);
+        } else {
+            window.location.href = 'index.html';
+        }
+    };
+
+    window.addEventListener('normalizing:webview-shortcut', ((event: Event) => {
+        const customEvent = event as CustomEvent<{ action: string }>;
+        if (customEvent.detail?.action === 'close-tab') {
+            handleCloseTab();
+        }
+    }) as EventListener);
+
+    if (window.electronAPI?.onWebviewShortcut) {
+        window.electronAPI.onWebviewShortcut((payload) => {
+            if (payload.action === 'close-tab') {
+                handleCloseTab();
+            }
+        });
+    }
 
     const backBtn = document.getElementById('back-btn');
     backBtn?.addEventListener('click', goBack);

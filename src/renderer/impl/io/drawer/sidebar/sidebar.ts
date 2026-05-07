@@ -288,6 +288,40 @@ const initSidebar = (): void => {
 
     initSearchModal(modal, modalOverlay, modalClose, modalQueryInput, () => closeSidebar(sidebar));
 
+    const handleWebviewShortcut = (action: string): void => {
+        if (action !== 'open-search') return;
+        if (modal.getAttribute('aria-hidden') === 'false') {
+            modalQueryInput.focus();
+            return;
+        }
+        openSearchModal(modal, modalQueryInput);
+    };
+
+    window.addEventListener('normalizing:webview-shortcut', ((event: Event) => {
+        const customEvent = event as CustomEvent<{ action: string }>;
+        const action = customEvent.detail?.action;
+        if (!action) return;
+        if (action === 'close-tab') return;
+        handleWebviewShortcut(action);
+    }) as EventListener);
+
+    if (window.electronAPI?.onWebviewShortcut) {
+        window.electronAPI.onWebviewShortcut((payload) => {
+            handleWebviewShortcut(payload.action);
+        });
+    }
+
+    // Handle about links
+    document.addEventListener('click', (event: MouseEvent) => {
+        const target = event.target as HTMLElement;
+        if (target.classList.contains('c-settings-about-link') && target.dataset.aboutLink) {
+            event.preventDefault();
+            const url = target.dataset.aboutLink;
+            window.electronAPI?.openExternal(url);
+            window.electronAPI?.openUrlHtml('direct', url);
+        }
+    });
+
     // Restore sidebar state on page load
     if (getSidebarState()) {
         openSidebar(sidebar, refresh);

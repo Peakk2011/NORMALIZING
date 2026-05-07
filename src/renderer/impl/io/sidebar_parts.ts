@@ -11,6 +11,18 @@ const sidebarPartsHtml = `
             </button>
         </div>
         <div class="c-sidebar-toolbar">
+            <div class="c-sidebar-app-icon">
+                <svg width="584" height="451" viewBox="0 0 584 451" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="35" height="253" transform="matrix(1 0 0 -1 48 253.146)" fill="black"/>
+                    <rect width="48" height="450" transform="matrix(1 0 0 -1 0 450.146)" fill="black"/>
+                    <path d="M186 253.146H83V0.146484L186 253.146Z" fill="black"/>
+                    <rect width="94" height="197" transform="matrix(-1 0 0 1 142 253.146)" fill="black"/>
+                    <rect width="143" height="450" transform="matrix(-1 0 0 1 311 0.146484)" fill="black"/>
+                    <rect width="99" height="450" transform="matrix(1 0 0 -1 333 450.146)" fill="black"/>
+                    <rect width="152" height="225" transform="matrix(1 0 0 -1 431.998 225)" fill="black"/>
+                    <path d="M431.998 225H467.502L583.998 269.554V450H467.502L431.998 391.522V225Z" fill="black"/>
+                </svg>
+            </div>
             <button id="sidebar-new-btn" class="c-sidebar-action-btn" type="button">
                 <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z"/></svg>
                 <span>Launch</span>
@@ -142,10 +154,6 @@ const sidebarPartsHtml = `
                             <img src="${appIconUrl}" alt="Normalizing app icon" class="c-settings-about-icon">
                             <h4>NORMALIZING</h4>
                             <p>Version 1.0.0</p>
-                            <div class="c-settings-about-links">
-                                <a class="c-settings-about-link" href="https://github.com/Peakk2011/NORMALIZING" target="_blank" rel="noreferrer">An app created by Peakk</a>
-                                <a class="c-settings-about-link" href="https://github.com/Peakk2011/NORMALIZING/releases/tag/1.0.0" target="_blank" rel="noreferrer">View release and project details</a>
-                            </div>
                         </div>
                     </div>
                 </section>

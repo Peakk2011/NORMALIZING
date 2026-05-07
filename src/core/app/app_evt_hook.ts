@@ -1,6 +1,17 @@
 import fs from "node:fs";
 import path from "node:path";
-import { app, BrowserWindow, dialog, ipcMain, Menu, nativeTheme, session, shell, webContents } from "electron";
+import {
+    app,
+    BrowserWindow,
+    dialog,
+    globalShortcut,
+    ipcMain,
+    Menu,
+    nativeTheme,
+    session,
+    shell,
+    webContents
+} from "electron";
 import { setupSessionHandlers } from "../config/s0.js";
 import {
     clearWindowState,
@@ -134,6 +145,16 @@ export const registerApplicationEvents = (): void => {
                 },
             },
             {
+                label: "Inspect",
+                click: () => {
+                    try {
+                        target.openDevTools({ mode: "detach" });
+                    } catch {
+                        // ignore if unavailable
+                    }
+                },
+            },
+            {
                 label: "Save as...",
                 enabled: canUseCurrentUrl,
                 click: async () => {
@@ -170,6 +191,51 @@ export const registerApplicationEvents = (): void => {
         menu.popup();
     });
 
+    const webviewShortcutHandlers = new Map<number, (event: Electron.Event, input: Electron.Input) => void>();
+
+    ipcMain.on("register-webview-shortcut", (event, webContentsId: number) => {
+        if (typeof webContentsId !== "number" || webContentsId <= 0) return;
+        if (webviewShortcutHandlers.has(webContentsId)) return;
+
+        const guest = webContents.fromId(webContentsId);
+        if (!guest) return;
+
+        const handler = (inputEvent: Electron.Event, input: Electron.Input) => {
+            if (input.type !== "keyDown") return;
+            const key = String(input.key ?? "").toLowerCase();
+            const isCtrlOrMeta = input.control || input.meta;
+            const isFindShortcut = isCtrlOrMeta && !input.alt && key === "f";
+            const isCloseShortcut = isCtrlOrMeta && !input.alt && !input.shift && key === "w";
+            if (!isFindShortcut && !isCloseShortcut) return;
+
+            const owner = guest.hostWebContents;
+            if (!owner) return;
+            const action = isFindShortcut ? "open-search" : "close-tab";
+            owner.send("webview-shortcut", { action });
+            inputEvent.preventDefault();
+        };
+
+        webviewShortcutHandlers.set(webContentsId, handler);
+        guest.on("before-input-event", handler);
+        guest.once("destroyed", () => {
+            const registered = webviewShortcutHandlers.get(webContentsId);
+            if (registered) {
+                guest.removeListener("before-input-event", registered);
+                webviewShortcutHandlers.delete(webContentsId);
+            }
+        });
+
+        // Register global shortcuts for when the app window is focused
+        globalShortcut.register("CommandOrControl+F", () => {
+            const owner = guest.hostWebContents;
+            if (owner) owner.send("webview-shortcut", { action: "open-search" });
+        });
+        globalShortcut.register("CommandOrControl+W", () => {
+            const owner = guest.hostWebContents;
+            if (owner) owner.send("webview-shortcut", { action: "close-tab" });
+        });
+    });
+
     ipcMain.on("load-hist", (event) => {
         event.returnValue = readHistoryStore().history;
     });
@@ -204,6 +270,7 @@ export const registerApplicationEvents = (): void => {
 
     app.on("before-quit", () => {
         clearWindowState();
+        globalShortcut.unregisterAll();
         const mainWindow = getMainWindow();
         if (mainWindow && !mainWindow.isDestroyed()) {
             mainWindow.destroy();

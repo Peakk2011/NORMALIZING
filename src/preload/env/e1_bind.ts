@@ -19,6 +19,10 @@ export const exposeApi = (
         saveHist: (history: unknown[]) => ipcRenderer.send("save-hist", history),
         loadActive: () => ipcRenderer.sendSync("load-active"),
         saveActive: (activeKey: string | null) => ipcRenderer.send("save-active", activeKey),
+        registerWebviewShortcut: (webContentsId: number) => ipcRenderer.send("register-webview-shortcut", webContentsId),
+        onWebviewShortcut: (callback: (payload: { action: string }) => void) => {
+            ipcRenderer.on("webview-shortcut", (_event, payload) => callback(payload));
+        },
     });
 };
 
