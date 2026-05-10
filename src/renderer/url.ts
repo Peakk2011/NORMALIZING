@@ -196,17 +196,20 @@ const initWebview = (webview: Electron.WebviewTag): void => {
 
     const registerShortcut = (): void => {
         if (!window.electronAPI?.registerWebviewShortcut) return;
-        const webContentsId = webview.getWebContentsId();
-        if (typeof webContentsId === 'number' && webContentsId > 0) {
-            window.electronAPI.registerWebviewShortcut(webContentsId);
+
+        try {
+            const webContentsId = webview.getWebContentsId();
+            if (typeof webContentsId === 'number' && webContentsId > 0) {
+                window.electronAPI.registerWebviewShortcut(webContentsId);
+            }
+        } catch {
+            // WebView is not attached / ready yet. Wait for dom-ready.
         }
     };
 
     webview.addEventListener('dom-ready', () => {
         registerShortcut();
     });
-
-    registerShortcut();
 };
 
 const loadResult = (url: string): void => {
