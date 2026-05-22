@@ -152,10 +152,12 @@ const initWebview = (webview: Electron.WebviewTag): void => {
 
     webview.addEventListener('did-start-loading', () => {
         setRefreshLoadingState(true);
+        registerShortcut();
     });
 
     webview.addEventListener('did-stop-loading', () => {
         setRefreshLoadingState(false);
+        void updateTitleFromWebview();
     });
 
     webview.addEventListener('did-fail-load', (event: Event) => {
@@ -194,6 +196,11 @@ const initWebview = (webview: Electron.WebviewTag): void => {
         });
     });
 
+    // Listen for page title changes
+    webview.addEventListener('page-title-updated', () => {
+        void updateTitleFromWebview();
+    });
+
     const registerShortcut = (): void => {
         if (!window.electronAPI?.registerWebviewShortcut) return;
 
@@ -210,6 +217,32 @@ const initWebview = (webview: Electron.WebviewTag): void => {
     webview.addEventListener('dom-ready', () => {
         registerShortcut();
     });
+};
+
+// Store the current display mode for the URL bar
+let currentPageTitle: string | null = null;
+let isUrlBarFocused = false;
+
+const updateTitleFromWebview = async (): Promise<void> => {
+    const searchTitle = document.getElementById('search-title-input') as HTMLInputElement | null;
+    if (!searchTitle || !activeWebview) return;
+
+    try {
+        const webContentsId = activeWebview.getWebContentsId();
+        const title = await window.electronAPI?.getWebviewTitle(webContentsId);
+
+        if (title && title.trim()) {
+            currentPageTitle = title.trim();
+            // Don't update the input value if the user is currently editing
+            if (!isUrlBarFocused) {
+                searchTitle.value = currentPageTitle;
+                searchTitle.title = currentPageTitle;
+                searchTitle.classList.remove('is-url-detected');
+            }
+        }
+    } catch {
+        // Ignore errors when getting title
+    }
 };
 
 const loadResult = (url: string): void => {
@@ -356,17 +389,27 @@ const initHeader = (): void => {
 
     // Show full URL when focused
     searchTitle.addEventListener('focus', () => {
-        searchTitle.value = currentData?.query ?? '';
+        isUrlBarFocused = true;
+        const currentUrl = getCurrentUrl();
+        if (currentUrl) {
+            searchTitle.value = currentUrl;
+        }
     });
 
-    // Truncate back when blurred if it's a URL
+    // Show page title (or truncated URL) when blurred
     searchTitle.addEventListener('blur', () => {
-        if (!currentData) return;
-        if (isLikelyUrl(currentData.query)) {
-            const truncated = currentData.query.length > 40
-                ? currentData.query.slice(0, 20) + '...' + currentData.query.slice(-17)
-                : currentData.query;
-            searchTitle.value = truncated;
+        isUrlBarFocused = false;
+        // If we have a page title, show it; otherwise show truncated URL
+        if (currentPageTitle) {
+            searchTitle.value = currentPageTitle;
+            searchTitle.title = currentPageTitle;
+        } else if (currentData) {
+            if (isLikelyUrl(currentData.query)) {
+                const truncated = currentData.query.length > 40
+                    ? currentData.query.slice(0, 20) + '...' + currentData.query.slice(-17)
+                    : currentData.query;
+                searchTitle.value = truncated;
+            }
         }
     });
 

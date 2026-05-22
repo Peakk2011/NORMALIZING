@@ -10,6 +10,7 @@ export interface ElectronAPI {
     setTheme: (source: "system" | "light" | "dark") => void;
     registerWebviewShortcut: (webContentsId: number) => void;
     onWebviewShortcut: (callback: (payload: { action: string }) => void) => void;
+    getWebviewTitle: (webContentsId: number) => Promise<string | null>;
     loadHist: () => unknown[];
     saveHist: (history: unknown[]) => void;
     loadActive: () => string | null;

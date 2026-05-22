@@ -23,6 +23,7 @@ export const exposeApi = (
         onWebviewShortcut: (callback: (payload: { action: string }) => void) => {
             ipcRenderer.on("webview-shortcut", (_event, payload) => callback(payload));
         },
+        getWebviewTitle: (webContentsId: number) => ipcRenderer.invoke("get-webview-title", webContentsId),
     });
 };
 

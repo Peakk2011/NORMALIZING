@@ -224,16 +224,6 @@ export const registerApplicationEvents = (): void => {
                 webviewShortcutHandlers.delete(webContentsId);
             }
         });
-
-        // Register global shortcuts for when the app window is focused
-        globalShortcut.register("CommandOrControl+F", () => {
-            const owner = guest.hostWebContents;
-            if (owner) owner.send("webview-shortcut", { action: "open-search" });
-        });
-        globalShortcut.register("CommandOrControl+W", () => {
-            const owner = guest.hostWebContents;
-            if (owner) owner.send("webview-shortcut", { action: "close-tab" });
-        });
     });
 
     ipcMain.on("load-hist", (event) => {
@@ -260,6 +250,12 @@ export const registerApplicationEvents = (): void => {
             nativeTheme.themeSource = source;
             refreshOverlay();
         }
+    });
+
+    ipcMain.handle("get-webview-title", async (event, webContentsId: number): Promise<string | null> => {
+        const guest = webContents.fromId(webContentsId);
+        if (!guest) return null;
+        return guest.getTitle();
     });
 
     app.whenReady().then(() => {
