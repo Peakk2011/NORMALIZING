@@ -1,0 +1,45 @@
+.c-history-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: min(250px, 100vw);
+    max-width: 270px;
+    padding: 16px 20px;
+    background: var(--theme-sidebar-glass);
+    border-right: solid 1px var(--theme-border-soft);
+    backdrop-filter: blur(12px);
+    box-shadow: var(--shadow-lg);
+    transform: translateX(-110%);
+    transition: transform 0.22s ease;
+    will-change: transform;
+    z-index: 21;
+    overflow-y: auto;
+    display: block;
+    -webkit-app-region: no-drag !important;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.c-history-sidebar::-webkit-scrollbar {
+    display: none;
+}
+
+.c-history-sidebar.is-open {
+    transform: translateX(0);
+}
+
+.c-history-sidebar.u-hidden {
+    transform: translateX(-110%);
+    pointer-events: none;
+}
+
+:root {
+    --sidebar-width: min(250px, 100vw);
+    --sidebar-width-compact: min(80px, 100vw);
+    --sidebar-header-join-radius: 12px;
+}
+
+.has-compact-sidebar {
+    --sidebar-width: var(--sidebar-width-compact);
+}

@@ -1,0 +1,351 @@
+.c-settings-modal {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10040;
+    opacity: 0;
+    transition: opacity 0.12s ease-in;
+}
+
+.c-settings-modal.u-hidden {
+    display: none;
+}
+
+.c-settings-modal.is-visible {
+    opacity: 1;
+}
+
+.c-settings-modal-titlebar {
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+}
+
+.c-settings-modal-titlebar h1 {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1;
+    font-weight: 550;
+    letter-spacing: -0.4px;
+    color: var(--theme-black);
+    font-family: 'General Sans', 'Sarabun', 'system-ui', 'leelawadee UI', sans-serif;
+    text-align: center;
+    align-content: center;
+    height: 38px;
+}
+
+.c-settings-overlay {
+    position: absolute;
+    inset: 0;
+    background: var(--theme-overlay);
+    backdrop-filter: blur(40px);
+    opacity: 0;
+    transition: opacity 0.12s ease-in;
+}
+
+.c-settings-modal.is-visible .c-settings-overlay {
+    opacity: 1;
+}
+
+.c-settings-panel {
+    position: relative;
+    width: min(400px, calc(100vw - 24px));
+    height: 420px;
+    display: flex;
+    flex-direction: column;
+    outline-offset: -1px;
+    color: var(--theme-black);
+    opacity: 0;
+    transition: opacity 0.12s ease-in;
+}
+
+.c-settings-modal.is-visible .c-settings-panel {
+    opacity: 1;
+}
+
+.c-settings-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid var(--theme-border-soft);
+    background-color: var(--theme-bg);
+    box-shadow: var(--shadow-lg);
+    margin-bottom: 0.8rem;
+    border-radius: 2px;
+}
+
+.c-settings-heading,
+.c-settings-kicker {
+    display: none;
+}
+
+.c-settings-shell {
+    display: block;
+    min-height: 0;
+}
+
+.c-settings-menu-bar {
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    padding: 0;
+    background: transparent;
+    border-right: none;
+}
+
+.c-settings-menu-btn {
+    border: 1px solid transparent;
+    background: transparent;
+    font-family: 'General Sans', 'Sarabun', 'system-ui', 'leelawadee UI', sans-serif;
+    font-weight: 500;
+    letter-spacing: -0.2px;
+    color: var(--theme-black);
+    padding: 0.5rem 0.8rem;
+    height: 34px;
+    cursor: pointer;
+    font-size: 14px;
+    min-height: 0;
+    line-height: 1;
+    border-radius: 0;
+    text-align: center;
+    transition: none;
+}
+
+.c-settings-menu-btn:hover {
+    background: var(--theme-panel-hover);
+    transform: none;
+}
+
+.c-settings-menu-btn.is-active {
+    background: var(--theme-primary);
+    color: var(--theme-white);
+    border-color: transparent;
+    font-weight: 550;
+}
+
+.c-settings-close {
+    width: 34px;
+    height: 34px;
+    border: none;
+    background: transparent;
+    color: var(--theme-black);
+    font-size: 22px;
+    cursor: pointer;
+    line-height: 1.2;
+}
+
+.c-settings-close:hover {
+    background: var(--theme-primary);
+}
+
+.c-settings-close:hover span {
+    color: var(--theme-white);
+}
+
+.c-settings-close span {
+    display: inline-block;
+    transform: translate(0, -1.5px);
+    font-size: 28px;
+    font-weight: 100;
+    font-family: system-ui;
+}
+
+.c-settings-body {
+    flex: 1;
+    margin-top: 0;
+    overflow: visible;
+}
+
+.c-settings-section {
+    display: none;
+}
+
+.c-settings-section.is-active {
+    display: block;
+}
+
+.c-settings-section h3 {
+    font-size: 18px;
+    line-height: 1;
+    font-weight: 550;
+    letter-spacing: -0.4px;
+    text-transform: uppercase;
+}
+
+.c-settings-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    border: 1px solid var(--theme-border-soft);
+    background-color: var(--theme-bg);
+    box-shadow: var(--shadow-lg);
+    padding: 10px 14px;
+    margin-bottom: 1rem;
+    border-radius: 2px;
+}
+
+.c-settings-row:last-child {
+    border-bottom: none;
+}
+
+.c-settings-row-stack {
+    display: block;
+}
+
+.c-settings-copy h4 {
+    font-size: 16px;
+    font-weight: 550;
+    margin: 6px 0 12px;
+    letter-spacing: -0.3px;
+    text-transform: uppercase;
+}
+
+.c-settings-copy p {
+    margin: 0;
+    color: var(--theme-text-muted);
+    font-size: 12.5px;
+    line-height: 1.45;
+    letter-spacing: -0.1px;
+    font-family: 'Switzer', 'Sarabun', 'system-ui', 'leelawadee UI', sans-serif;
+}
+
+.c-settings-about-copy {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 8px;
+    padding-block: 0.5rem;
+}
+
+.c-settings-about-copy h4 {
+    margin: 0;
+}
+
+.c-settings-about-icon {
+    width: 56px;
+    height: 56px;
+    object-fit: contain;
+    margin-top: 0.1rem;
+    margin-bottom: 0.2rem;
+}
+
+.c-settings-switch {
+    position: relative;
+    display: inline-flex;
+    flex-shrink: 0;
+}
+
+.c-settings-switch input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.c-settings-switch-ui {
+    width: 42px;
+    height: 24px;
+    border-radius: 999px;
+    background: var(--theme-border-soft);
+    position: relative;
+    transition: background-color 0.16s ease;
+}
+
+.c-settings-switch-ui::after {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--theme-white);
+    box-shadow: var(--shadow-soft);
+    transition: transform 0.16s ease;
+}
+
+.c-settings-switch input:checked + .c-settings-switch-ui {
+    background: var(--theme-primary);
+}
+
+.c-settings-switch input:checked + .c-settings-switch-ui::after {
+    transform: translateX(18px);
+}
+
+.c-theme-choice-list,
+.c-settings-chip-row {
+    margin-top: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    background-color: var(--theme-bg);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--theme-border-soft);
+    margin-bottom: 1rem;
+    border-radius: 2px;
+}
+
+.c-theme-choice-btn:hover,
+.c-settings-chip:hover {
+    background-color: var(--theme-panel-hover);
+}
+
+.c-settings-search-platforms {
+    margin-top: 1rem;
+    background-color: var(--theme-bg);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--theme-border-soft);
+}
+
+.c-theme-choice-btn,
+.c-settings-chip {
+    background: transparent;
+    color: var(--theme-black);
+    border: none;
+    padding: 0.4rem 0.8rem;
+    width: 100%;
+    min-height: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    cursor: pointer;
+    font-size: 13.5px;
+    letter-spacing: -0.2px;
+    font-family: 'Switzer', 'Sarabun', 'system-ui', 'leelawadee UI', sans-serif;
+}
+
+.c-theme-choice-btn.is-active,
+.c-settings-chip.is-active,
+.c-settings-platform-btn.is-active {
+    background: var(--theme-primary);
+    color: var(--theme-white);
+    border-color: transparent;
+    font-weight: 600;
+}
+
+.c-theme-choice-btn.is-active:hover,
+.c-settings-chip.is-active:hover,
+.c-settings-platform-btn.is-active:hover {
+    background: var(--theme-primary);
+    color: var(--theme-white);
+    border-color: transparent;
+    font-weight: 600;
+}
+
+.c-settings-link-chip {
+    color: var(--theme-black);
+    text-decoration: none;
+}
+
+.c-settings-link-chip:hover,
+.c-settings-platform-btn:hover,
+.c-settings-action-pill:hover {
+    background-color: var(--theme-panel-hover);
+    border-color: transparent;
+}

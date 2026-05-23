@@ -1,0 +1,37 @@
+.c-sidebar-footer {
+    margin-top: 14px;
+    padding-top: 10px;
+}
+
+.c-sidebar-settings-btn {
+    width: calc(100% - 22px);
+    background: var(--theme-surface);
+    outline: 1px solid var(--theme-border-contrast);
+    box-shadow: var(--shadow-history-card);
+    border: none;
+    color: var(--theme-black);
+    border-radius: 100vmax;
+    height: 36px;
+    cursor: pointer;
+    font-family: 'General Sans', 'Sarabun', 'system-ui', 'leelawadee UI', sans-serif;
+    position: absolute;
+    bottom: 20px;
+    transform: translateX(-8.5px);
+}
+
+.c-sidebar-settings-btn span {
+    margin-left: 2px;
+    vertical-align: middle;
+    font-weight: 480;
+    font-size: 13px;
+}
+
+.c-sidebar-settings-btn svg {
+    width: 20px;
+    height: 20px;
+    vertical-align: middle;
+}
+
+.c-sidebar-settings-btn:hover {
+    background: var(--theme-overlay-soft);
+}

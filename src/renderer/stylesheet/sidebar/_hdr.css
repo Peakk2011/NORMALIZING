@@ -1,0 +1,47 @@
+.c-sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2px;
+    margin-bottom: 12px;
+    user-select: none;
+}
+
+.c-sidebar-logo {
+    font-size: 18px;
+    font-weight: 550;
+    letter-spacing: -0.6px;
+    line-height: 0;
+}
+
+.c-sidebar-close,
+.c-sidebar-action-btn,
+.c-modal-close,
+.c-modal-platforms button {
+    border: none;
+    cursor: pointer;
+    border-radius: 999px;
+    font-family: 'General Sans', 'Sarabun', 'system-ui', 'leelawadee UI', sans-serif;
+}
+
+.c-sidebar-close {
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: transparent;
+    font-size: 29px;
+    line-height: 1;
+    -webkit-app-region: no-drag;
+    transition: transform 0.15s ease, background-color 0.15s ease;
+    transform: translateY(-0.5px);
+}
+
+.c-sidebar-close:hover {
+    background: var(--theme-panel-hover);
+}
+
+.c-sidebar-close:hover svg path {
+    fill: var(--theme-black);
+}

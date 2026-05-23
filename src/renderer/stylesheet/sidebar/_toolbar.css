@@ -1,0 +1,79 @@
+.c-sidebar-toolbar {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.c-sidebar-app-icon {
+    display: none;
+    width: 25px;
+    height: 25px;
+    overflow: hidden;
+    margin-top: 0.2rem;
+    margin-left: 0.35rem;
+    margin-bottom: 0.25rem;
+}
+
+.c-sidebar-app-icon svg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.c-sidebar-action-btn {
+    flex: 1;
+    min-width: 100px;
+    padding: 0.45rem 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--theme-black);
+    box-shadow: var(--shadow-action-pill);
+    color: var(--theme-white);
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.c-sidebar-action-btn svg {
+    width: fit-content;
+    width: 20px;
+    height: 22px;
+    margin-left: 0;
+}
+
+.c-sidebar-action-btn svg path {
+    fill: var(--theme-white);
+}
+
+.c-sidebar-action-btn span {
+    color: inherit;
+    font-size: 14px;
+    font-weight: 550;
+    letter-spacing: -0.2px;
+    user-select: none;
+    margin: 0;
+}
+
+.c-sidebar-action-secondary {
+    background: transparent;
+}
+
+.c-sidebar-action-secondary span {
+    color: var(--theme-black);
+}
+
+.c-sidebar-action-secondary:hover {
+    background: var(--theme-bg);
+}
+
+.c-sidebar-action-secondary svg path {
+    fill: var(--theme-black);
+}
+
+.c-sidebar-action-btn:hover {
+    filter: brightness(90%);
+}
+
+.c-sidebar-action-secondary:hover {
+    background: var(--theme-hover-neutral);
+}

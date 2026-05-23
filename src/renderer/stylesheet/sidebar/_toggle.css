@@ -1,0 +1,27 @@
+.c-sidebar-toggle {
+    position: fixed;
+    top: 8px;
+    left: 8px;
+    width: 32px;
+    height: 32px;
+    z-index: 20;
+    border: none;
+    border-radius: 100vmax;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background-color: var(--theme-bg);
+    -webkit-app-region: no-drag;
+    transition: transform 0.15s ease, background-color 0.15s ease;
+}
+
+.c-sidebar-toggle:hover {
+    background: var(--theme-panel-hover);
+    box-shadow: var(--shadow-md);
+}
+
+.c-sidebar-toggle svg {
+    width: 20px;
+    height: 20px;
+}
