@@ -44,7 +44,7 @@ export const refreshOverlay = (): void => {
     BrowserWindow.getAllWindows().forEach(titlebarOverlayWin);
 };
 
-export const createWindow = (url: string, width = 900, height = 780): ElectronBrowserWindow => {
+export const createWindow = (url: string, width = 520, height = 615): ElectronBrowserWindow => {
     const windowOptions: BrowserWindowConstructorOptions = {
         width,
         height,
@@ -123,9 +123,9 @@ export const createWindow = (url: string, width = 900, height = 780): ElectronBr
         }
 
         delete webPreferences.preload;
-        webPreferences.nodeIntegration = false;
-        webPreferences.contextIsolation = true;
-        webPreferences.sandbox = true;
+        webPreferences.nodeIntegration = true;
+        webPreferences.contextIsolation = false;
+        webPreferences.sandbox = false;
         webPreferences.webSecurity = true;
         webPreferences.allowRunningInsecureContent = false;
     });

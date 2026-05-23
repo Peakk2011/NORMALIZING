@@ -280,28 +280,122 @@ const initSidebar = (): void => {
         }
     });
     document.addEventListener('keydown', (event: KeyboardEvent) => {
-        if (event.key === 'Escape' && settingsModal.getAttribute('aria-hidden') === 'false') {
-            event.preventDefault();
-            closeSettingsModal();
+        if (settingsModal.getAttribute('aria-hidden') === 'false') {
+            // Settings modal is open
+            const target = event.target as HTMLElement;
+            const isInputLike = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable;
+
+            // Handle Escape key to close settings
+            if (event.key === 'Escape') {
+                event.preventDefault();
+                closeSettingsModal();
+                return;
+            }
+
+            // Ignore Arrow keys if focus is in an input-like element
+            if (isInputLike && (event.key === 'ArrowLeft' || event.key === 'ArrowRight' || event.key === 'ArrowUp' || event.key === 'ArrowDown')) {
+                return;
+            }
+
+            // Handle tab navigation with Arrow keys
+            if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+                event.preventDefault();
+                // Check if focus is on a tab button
+                if (target.classList.contains('c-settings-menu-btn') && settingsTabs.length > 0) {
+                    const currentIndex = settingsTabs.indexOf(target as HTMLButtonElement);
+                    const nextIndex = (currentIndex + 1) % settingsTabs.length;
+                    const nextTab = settingsTabs[nextIndex];
+                    if (nextTab) {
+                        nextTab.focus();
+                        setActiveSettingsTab(nextTab.dataset.settingsTab ?? 'general');
+                    }
+                }
+                // Check if focus is on a theme button
+                else if (target.classList.contains('c-theme-choice-btn') && themeButtons.length > 0) {
+                    const currentIndex = themeButtons.indexOf(target as HTMLButtonElement);
+                    const nextIndex = (currentIndex + 1) % themeButtons.length;
+                    const nextBtn = themeButtons[nextIndex];
+                    if (nextBtn) {
+                        nextBtn.focus();
+                        // Trigger click to activate the theme
+                        nextBtn.click();
+                    }
+                }
+                // Check if focus is on a platform button
+                else if (target.classList.contains('c-settings-platform-btn') && defaultPlatformButtons.length > 0) {
+                    const currentIndex = defaultPlatformButtons.indexOf(target as HTMLButtonElement);
+                    const nextIndex = (currentIndex + 1) % defaultPlatformButtons.length;
+                    const nextBtn = defaultPlatformButtons[nextIndex];
+                    if (nextBtn) {
+                        nextBtn.focus();
+                        // Trigger click to activate the platform
+                        nextBtn.click();
+                    }
+                }
+            } else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+                event.preventDefault();
+                // Check if focus is on a tab button
+                if (target.classList.contains('c-settings-menu-btn') && settingsTabs.length > 0) {
+                    const currentIndex = settingsTabs.indexOf(target as HTMLButtonElement);
+                    const prevIndex = (currentIndex - 1 + settingsTabs.length) % settingsTabs.length;
+                    const prevTab = settingsTabs[prevIndex];
+                    if (prevTab) {
+                        prevTab.focus();
+                        setActiveSettingsTab(prevTab.dataset.settingsTab ?? 'general');
+                    }
+                }
+                // Check if focus is on a theme button
+                else if (target.classList.contains('c-theme-choice-btn') && themeButtons.length > 0) {
+                    const currentIndex = themeButtons.indexOf(target as HTMLButtonElement);
+                    const prevIndex = (currentIndex - 1 + themeButtons.length) % themeButtons.length;
+                    const prevBtn = themeButtons[prevIndex];
+                    if (prevBtn) {
+                        prevBtn.focus();
+                        // Trigger click to activate the theme
+                        prevBtn.click();
+                    }
+                }
+                // Check if focus is on a platform button
+                else if (target.classList.contains('c-settings-platform-btn') && defaultPlatformButtons.length > 0) {
+                    const currentIndex = defaultPlatformButtons.indexOf(target as HTMLButtonElement);
+                    const prevIndex = (currentIndex - 1 + defaultPlatformButtons.length) % defaultPlatformButtons.length;
+                    const prevBtn = defaultPlatformButtons[prevIndex];
+                    if (prevBtn) {
+                        prevBtn.focus();
+                        // Trigger click to activate the platform
+                        prevBtn.click();
+                    }
+                }
+            }
         }
     });
 
     initSearchModal(modal, modalOverlay, modalClose, modalQueryInput, () => closeSidebar(sidebar));
 
     const handleWebviewShortcut = (action: string): void => {
-        if (action !== 'open-search') return;
-        if (modal.getAttribute('aria-hidden') === 'false') {
-            modalQueryInput.focus();
-            return;
+        if (action === 'open-search') {
+            if (modal.getAttribute('aria-hidden') === 'false') {
+                modalQueryInput.focus();
+                return;
+            }
+            openSearchModal(modal, modalQueryInput);
+        } else if (action === 'close-tab') {
+            window.dispatchEvent(new CustomEvent('normalizing:close-tab'));
+        } else if (action === 'new-tab') {
+            window.dispatchEvent(new CustomEvent('normalizing:new-tab'));
+        } else if (action === 'toggle-settings') {
+            if (settingsModal.getAttribute('aria-hidden') === 'false') {
+                closeSettingsModal();
+            } else {
+                openSettingsModal();
+            }
         }
-        openSearchModal(modal, modalQueryInput);
     };
 
     window.addEventListener('normalizing:webview-shortcut', ((event: Event) => {
         const customEvent = event as CustomEvent<{ action: string }>;
         const action = customEvent.detail?.action;
         if (!action) return;
-        if (action === 'close-tab') return;
         handleWebviewShortcut(action);
     }) as EventListener);
 
@@ -322,10 +416,7 @@ const initSidebar = (): void => {
         }
     });
 
-    // Restore sidebar state on page load
-    if (getSidebarState()) {
-        openSidebar(sidebar, refresh);
-    }
+    // Sidebar state restoration removed to ensure it starts closed by default
 
     syncSettingsState();
     refresh();

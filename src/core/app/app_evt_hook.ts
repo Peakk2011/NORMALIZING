@@ -35,21 +35,15 @@ const isSafeExternalUrl = (value: string): boolean => {
 
 const readHistoryStore = (): { history: unknown[]; activeKey: string | null } => {
     try {
-        if (!fs.existsSync(HISTORY_FILE_PATH)) {
-            return { history: [], activeKey: null };
-        }
+        if (!fs.existsSync(HISTORY_FILE_PATH)) return { history: [], activeKey: null };
 
-        const data = fs.readFileSync(HISTORY_FILE_PATH, { encoding: "utf8" });
-        const parsed = JSON.parse(data);
+        const data   = fs.readFileSync(HISTORY_FILE_PATH, { encoding: "utf8" });
+        const parsed = JSON.parse(data) as Record<string, unknown>;
         if (!parsed || typeof parsed !== "object") return { history: [], activeKey: null };
 
         return {
-            history: Array.isArray((parsed as { history?: unknown[] }).history)
-                ? (parsed as { history: unknown[] }).history
-                : [],
-            activeKey: typeof (parsed as { activeKey?: unknown }).activeKey === "string"
-                ? (parsed as { activeKey: string }).activeKey
-                : null,
+            history:   Array.isArray(parsed["history"]) ? parsed["history"] : [],
+            activeKey: typeof parsed["activeKey"] === "string" ? parsed["activeKey"] : null,
         };
     } catch {
         return { history: [], activeKey: null };
@@ -68,13 +62,13 @@ const writeHistoryStore = (history: unknown[], activeKey: string | null): void =
 const logGpuStatus = async (): Promise<void> => {
     try {
         const featureStatus = app.getGPUFeatureStatus();
-        const gpuInfo = await app.getGPUInfo("basic");
+        const gpuInfo       = await app.getGPUInfo("basic");
         console.log("[gpu] feature status =", featureStatus);
         console.log("[gpu] basic info =", gpuInfo);
 
-        const softwareFlags = Object.values(featureStatus).filter((value) =>
-            typeof value === "string" && (value.includes("software") || value.includes("disabled")));
-
+        const softwareFlags = Object.values(featureStatus).filter(
+            (v) => typeof v === "string" && (v.includes("software") || v.includes("disabled"))
+        );
         if (softwareFlags.length > 0) {
             console.warn("[gpu] Some GPU features are disabled or using software rendering.");
         }
@@ -83,147 +77,130 @@ const logGpuStatus = async (): Promise<void> => {
     }
 };
 
+const SHORTCUT_INJECT_SCRIPT = `
+(function() {
+    if (window.__normalizingShortcutInjected) return;
+    window.__normalizingShortcutInjected = true;
+    const ACTION_MAP = { f: 'open-search', w: 'close-tab', t: 'new-tab' };
+    window.addEventListener('keydown', function(e) {
+        if ((!e.ctrlKey && !e.metaKey) || e.altKey) return;
+        const key    = e.key.toLowerCase();
+        const action = (key === '+' || key === '=') ? 'toggle-settings' : ACTION_MAP[key];
+        if (!action) return;
+        e.preventDefault();
+        e.stopPropagation();
+        window.postMessage({ __normalizing: true, action }, '*');
+    }, true);
+})();
+`;
+
+const webviewShortcutGuard = new Set<number>();
+
+const registerWebviewShortcut = (webContentsId: number): void => {
+    if (typeof webContentsId !== "number" || webContentsId <= 0) return;
+    if (webviewShortcutGuard.has(webContentsId)) return;
+
+    const guest = webContents.fromId(webContentsId);
+    if (!guest) return;
+
+    webviewShortcutGuard.add(webContentsId);
+
+    console.log("[shortcut] registering id:", webContentsId);
+    console.log("[shortcut] guest type:", guest.getType());
+    console.log("[shortcut] guest url:", guest.getURL());
+    console.log("[shortcut] all webContents:", webContents.getAllWebContents().map(w => `id=${w.id} type=${w.getType()} url=${w.getURL()}`));
+
+    const tryInject = (): void => {
+        if (guest.isDestroyed()) return;
+        console.log("[shortcut] injecting into id:", webContentsId, "url:", guest.getURL());
+        guest.executeJavaScript(SHORTCUT_INJECT_SCRIPT)
+            .then(() => console.log("[shortcut] inject SUCCESS id:", webContentsId))
+            .catch((err) => console.error("[shortcut] inject FAILED id:", webContentsId, err));
+    };
+
+    tryInject();
+
+    guest.on("dom-ready",            tryInject);
+    guest.on("did-navigate",         tryInject);
+    guest.on("did-navigate-in-page", tryInject);
+
+    guest.once("destroyed", () => {
+        webviewShortcutGuard.delete(webContentsId);
+    });
+};
+
 export const registerApplicationEvents = (): void => {
     ipcMain.on("open-url-html", (_event, data: { platform: string; query: string }) => {
         openUrlWindow(data.platform, data.query);
     });
 
     ipcMain.on("open-external", (_event, url: string) => {
-        if (!isSafeExternalUrl(url)) {
-            return;
-        }
+        if (!isSafeExternalUrl(url)) return;
         void shell.openExternal(url);
     });
 
     ipcMain.on("show-webview-context-menu", (event, payload: {
         webContentsId: number;
-        currentUrl: string | null;
-        canCopy: boolean;
-        canPaste: boolean;
+        currentUrl:    string | null;
+        canCopy:       boolean;
+        canPaste:      boolean;
     }) => {
         const target = webContents.fromId(payload.webContentsId);
         if (!target) return;
 
-        const ownerWindow = BrowserWindow.fromWebContents(event.sender) ?? null;
-        const currentUrl = typeof payload.currentUrl === "string" ? payload.currentUrl : null;
+        const ownerWindow      = BrowserWindow.fromWebContents(event.sender) ?? null;
+        const currentUrl       = typeof payload.currentUrl === "string" ? payload.currentUrl : null;
         const canUseCurrentUrl = currentUrl !== null && isSafeExternalUrl(currentUrl);
 
+        const saveDialogOptions: Electron.SaveDialogOptions = {
+            title:       "Save page as",
+            defaultPath: "page.html",
+            filters: [
+                { name: "Web Page",   extensions: ["html", "htm"] },
+                { name: "All Files",  extensions: ["*"] },
+            ],
+        };
+
         const menu = Menu.buildFromTemplate([
-            {
-                label: "Back",
-                enabled: target.canGoBack(),
-                click: () => target.goBack(),
-            },
-            {
-                label: "Forward",
-                enabled: target.canGoForward(),
-                click: () => target.goForward(),
-            },
-            {
-                label: "Reload",
-                click: () => target.reload(),
-            },
+            { label: "Back",    enabled: target.canGoBack(),    click: () => target.goBack() },
+            { label: "Forward", enabled: target.canGoForward(), click: () => target.goForward() },
+            { label: "Reload",  click: () => target.reload() },
+            { type: "separator" },
+            { label: "Copy",  enabled: payload.canCopy,  click: () => target.copy() },
+            { label: "Paste", enabled: payload.canPaste, click: () => target.paste() },
             { type: "separator" },
             {
-                label: "Copy",
-                enabled: payload.canCopy,
-                click: () => target.copy(),
-            },
-            {
-                label: "Paste",
-                enabled: payload.canPaste,
-                click: () => target.paste(),
-            },
-            { type: "separator" },
-            {
-                label: "Open in New Window",
+                label:   "Open in New Window",
                 enabled: canUseCurrentUrl,
-                click: () => {
-                    if (currentUrl) {
-                        openDirectUrlWindow(currentUrl);
-                    }
-                },
+                click:   () => { if (currentUrl) openDirectUrlWindow(currentUrl); },
             },
             {
                 label: "Inspect",
                 click: () => {
-                    try {
-                        target.openDevTools({ mode: "detach" });
-                    } catch {
-                        // ignore if unavailable
-                    }
+                    try { target.openDevTools({ mode: "detach" }); } catch { /* unavailable */ }
                 },
             },
             {
-                label: "Save as...",
+                label:   "Save as...",
                 enabled: canUseCurrentUrl,
-                click: async () => {
+                click:   async () => {
                     if (!currentUrl) return;
-
-                    const { canceled, filePath } = ownerWindow
-                        ? await dialog.showSaveDialog(ownerWindow, {
-                            title: "Save page as",
-                            defaultPath: "page.html",
-                            filters: [
-                                { name: "Web Page", extensions: ["html", "htm"] },
-                                { name: "All Files", extensions: ["*"] },
-                            ],
-                        })
-                        : await dialog.showSaveDialog({
-                        title: "Save page as",
-                        defaultPath: "page.html",
-                        filters: [
-                            { name: "Web Page", extensions: ["html", "htm"] },
-                            { name: "All Files", extensions: ["*"] },
-                        ],
-                    });
-
-                    if (canceled || !filePath) return;
-                    await target.savePage(filePath, "HTMLComplete");
+                    const result = ownerWindow
+                        ? await dialog.showSaveDialog(ownerWindow, saveDialogOptions)
+                        : await dialog.showSaveDialog(saveDialogOptions);
+                    if (result.canceled || !result.filePath) return;
+                    await target.savePage(result.filePath, "HTMLComplete");
                 },
             },
         ]);
 
-        if (ownerWindow) {
-            menu.popup({ window: ownerWindow });
-            return;
-        }
-        menu.popup();
+        if (ownerWindow) menu.popup({ window: ownerWindow });
+        else menu.popup();
     });
 
-    const webviewShortcutHandlers = new Map<number, (event: Electron.Event, input: Electron.Input) => void>();
-
-    ipcMain.on("register-webview-shortcut", (event, webContentsId: number) => {
-        if (typeof webContentsId !== "number" || webContentsId <= 0) return;
-        if (webviewShortcutHandlers.has(webContentsId)) return;
-
-        const guest = webContents.fromId(webContentsId);
-        if (!guest) return;
-
-        const handler = (inputEvent: Electron.Event, input: Electron.Input) => {
-            if (input.type !== "keyDown") return;
-            const key = String(input.key ?? "").toLowerCase();
-            const isCtrlOrMeta = input.control || input.meta;
-            const isFindShortcut = isCtrlOrMeta && !input.alt && key === "f";
-            const isCloseShortcut = isCtrlOrMeta && !input.alt && !input.shift && key === "w";
-            if (!isFindShortcut && !isCloseShortcut) return;
-
-            const owner = guest.hostWebContents;
-            if (!owner) return;
-            const action = isFindShortcut ? "open-search" : "close-tab";
-            owner.send("webview-shortcut", { action });
-            inputEvent.preventDefault();
-        };
-
-        webviewShortcutHandlers.set(webContentsId, handler);
-        guest.on("before-input-event", handler);
-        guest.once("destroyed", () => {
-            const registered = webviewShortcutHandlers.get(webContentsId);
-            if (registered) {
-                guest.removeListener("before-input-event", registered);
-                webviewShortcutHandlers.delete(webContentsId);
-            }
-        });
+    ipcMain.on("register-webview-shortcut", (_event, webContentsId: number) => {
+        console.log(`[Webview Shortcut] Registering for ID: ${webContentsId}`);
+        registerWebviewShortcut(webContentsId);
     });
 
     ipcMain.on("load-hist", (event) => {
@@ -236,8 +213,7 @@ export const registerApplicationEvents = (): void => {
     });
 
     ipcMain.on("load-active", (event) => {
-        const store = readHistoryStore();
-        event.returnValue = store.activeKey;
+        event.returnValue = readHistoryStore().activeKey;
     });
 
     ipcMain.on("save-active", (_event, activeKey: string | null) => {
@@ -252,31 +228,45 @@ export const registerApplicationEvents = (): void => {
         }
     });
 
-    ipcMain.handle("get-webview-title", async (event, webContentsId: number): Promise<string | null> => {
+    ipcMain.handle("get-webview-title", (_event, webContentsId: number): string | null => {
         const guest = webContents.fromId(webContentsId);
-        if (!guest) return null;
-        return guest.getTitle();
+        return guest?.getTitle() ?? null;
     });
 
     app.whenReady().then(() => {
         setupSessionHandlers(session.defaultSession);
         void logGpuStatus();
-        createMainWindow();
+        const win = createMainWindow();
+
+        win.webContents.on("before-input-event", (event, input) => {
+            if (input.type !== "keyDown") return;
+            const key = String(input.key ?? "").toLowerCase();
+            const isCtrlOrMeta = input.control || input.meta;
+
+            const isFindShortcut = isCtrlOrMeta && !input.alt && key === "f";
+            const isCloseShortcut = isCtrlOrMeta && !input.alt && key === "w";
+            const isNewTabShortcut = isCtrlOrMeta && !input.alt && key === "t";
+            const isToggleSettingsShortcut = isCtrlOrMeta && !input.alt && (key === "+" || key === "=");
+
+            if (isFindShortcut || isCloseShortcut || isNewTabShortcut || isToggleSettingsShortcut) {
+                console.log(`[Main Window Shortcut] Action: ${isFindShortcut ? 'open-search' : isCloseShortcut ? 'close-tab' : isNewTabShortcut ? 'new-tab' : 'toggle-settings'}`);
+                win.webContents.send("webview-shortcut", {
+                    action: isFindShortcut ? "open-search" : isCloseShortcut ? "close-tab" : isNewTabShortcut ? "new-tab" : "toggle-settings"
+                });
+                event.preventDefault();
+            }
+        });
     });
 
     app.on("before-quit", () => {
         clearWindowState();
         globalShortcut.unregisterAll();
         const mainWindow = getMainWindow();
-        if (mainWindow && !mainWindow.isDestroyed()) {
-            mainWindow.destroy();
-        }
+        if (mainWindow && !mainWindow.isDestroyed()) mainWindow.destroy();
     });
 
     app.on("window-all-closed", () => {
-        if (process.platform !== "darwin" && getMainWindow() === null) {
-            app.quit();
-        }
+        if (process.platform !== "darwin" && getMainWindow() === null) app.quit();
     });
 
     app.on("activate", () => {

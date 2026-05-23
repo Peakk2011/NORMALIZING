@@ -28,7 +28,7 @@ export const openUrlWindow = (platform: string, query: string): void => {
     }
 
     const urlHtmlUrl = `${rendererUrl.replace("index.html", "url.html")}?platform=${encodeURIComponent(platform)}&query=${encodeURIComponent(query)}`;
-    const newWin = createWindow(urlHtmlUrl, 900, 780);
+    const newWin = createWindow(urlHtmlUrl, 520, 615);
 
     newWin.on("closed", () => {
         urlViewWindows.delete(windowKey);
@@ -38,7 +38,7 @@ export const openUrlWindow = (platform: string, query: string): void => {
 };
 
 export const openDirectUrlWindow = (url: string): void => {
-    const newWin = createWindow(url, 900, 780);
+    const newWin = createWindow(url, 520, 615);
     newWin.on("closed", () => {
         for (const [key, value] of urlViewWindows.entries()) {
             if (value === newWin) {
@@ -49,7 +49,7 @@ export const openDirectUrlWindow = (url: string): void => {
 };
 
 export const createMainWindow = (): BrowserWindow => {
-    const win = createWindow(rendererUrl, 900, 780);
+    const win = createWindow(rendererUrl, 520, 615);
     mainWindow = win;
     win.on("closed", () => {
         mainWindow = null;
@@ -65,3 +65,27 @@ export const refreshOverlay = refreshOverlayImpl;
 export const clearWindowState = (): void => {
     urlViewWindows.clear();
 };
+
+/*
+BUG KNOWN:
+FROM 'GOOGLE GEMINI'
+
+[ Webview / Guest ]                 [ Renderer Process ]                 [ Main Process ]
+         |                                   |                                   |
+   (1) Mounts & Loads                        |                                   |
+         |                                   |                                   |
+   (2) Fires "dom-ready"                     |                                   |
+         | --------------------------------------------------------------------> | (No listener active yet!)
+         |                                   |                                   |   [ Event is lost ]
+         |                                   |                                   |
+         |                             (3) Calls:                                |
+         |                                 registerWebviewShortcut               |
+         |                                   | --------------------------------> |
+         |                                   |                                   | (4) Tries to bind:
+         |                                   |                                   |     guest.on("dom-ready")
+         |                                   |                                   |   [ Too late... ]
+         |                                   |                                   |
+         v                                   v                                   v
+ ───────────────────────────────────────────────────────────────────────────────────────────
+                                [ Result: tryInject is never called ]
+*/

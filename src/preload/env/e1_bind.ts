@@ -21,7 +21,10 @@ export const exposeApi = (
         saveActive: (activeKey: string | null) => ipcRenderer.send("save-active", activeKey),
         registerWebviewShortcut: (webContentsId: number) => ipcRenderer.send("register-webview-shortcut", webContentsId),
         onWebviewShortcut: (callback: (payload: { action: string }) => void) => {
-            ipcRenderer.on("webview-shortcut", (_event, payload) => callback(payload));
+            const handler = (_event: Electron.IpcRendererEvent, payload: { action: string }) =>
+                callback(payload);
+            ipcRenderer.on("webview-shortcut", handler);
+            return () => ipcRenderer.removeListener("webview-shortcut", handler);
         },
         getWebviewTitle: (webContentsId: number) => ipcRenderer.invoke("get-webview-title", webContentsId),
     });

@@ -96,4 +96,5 @@
     text-align: center;
     transition: transform 0.22s ease;
     will-change: transform;
+    width: 100%;
 }
