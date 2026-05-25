@@ -1,3 +1,5 @@
+import wait from "../api/wait.js";
+
 export interface AlertButton {
     label: string
     style?: "default" | "cancel" | "destructive"
@@ -83,11 +85,11 @@ export const Visualizer = (config: AlertConfig): Promise<AlertResult> => {
 
         const dismiss = (label: string, handler?: () => void): void => {
             overlay.classList.remove("vz-visible")
-            setTimeout(() => {
-                document.body.removeChild(overlay)
-                handler?.()
-                resolve(label)
-            }, 220)
+            void wait(220).then(() => {
+                document.body.removeChild(overlay);
+                handler?.();
+                resolve(label);
+            });
         }
 
         buttons.forEach((btn) => {

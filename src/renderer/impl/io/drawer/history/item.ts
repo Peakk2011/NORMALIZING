@@ -1,8 +1,22 @@
-import doSearch, { deleteSearchHistory, isActiveSearchHistory, makeHref, renameSearchHistory, setActiveSearchHistory } from '../../../search/search.js';
+import doSearch, {
+    deleteSearchHistory,
+    isActiveSearchHistory,
+    makeHref,
+    renameSearchHistory,
+    setActiveSearchHistory
+} from '../../../search/search.js';
 import mkReqUrl from '../../../search/mk_req_url.js';
 import { Visualizer } from '../../../../../visualizer/visualizer.js';
-import historyItemMenuHtml, { createHistoryItemMainContent, historyItemMenuToggleHtml } from '../../hist_ctx.js';
-import type { HistoryRecord, RefreshFn, CloseSidebarFn } from './types.js';
+import historyItemMenuHtml, {
+    createHistoryItemMainContent,
+    historyItemMenuToggleHtml
+} from '../../hist_ctx.js';
+import type {
+    HistoryRecord,
+    RefreshFn,
+    CloseSidebarFn
+} from './types.js';
+import wait from '../../../../../api/wait.js';
 
 const copyText = async (value: string): Promise<void> => {
     if (navigator.clipboard?.writeText) {
@@ -224,17 +238,17 @@ export const createHistoryItem = (
         item.classList.remove('is-menu-open');
         const deletingCurrentRecord = isCurrentRecordOpen(record);
         shell.classList.add('is-removing');
-        window.setTimeout(() => {
+        void (async () => {
+            await wait(180);
             deleteSearchHistory(record);
             if (deletingCurrentRecord) {
                 closeSidebarFn();
-                window.setTimeout(() => {
-                    window.location.href = 'index.html';
-                }, 220);
+                await wait(220);
+                window.location.href = 'index.html';
                 return;
             }
             refresh();
-        }, 180);
+        })();
     });
 
     item.append(mainButton, menuToggle, menu);

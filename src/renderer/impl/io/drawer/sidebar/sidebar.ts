@@ -1,10 +1,25 @@
-import { openSidebar, closeSidebar, toggleSidebar } from './dom.js';
-import { openSearchModal, closeSearchModal, initSearchModal } from '../modal/modal.js';
+import { 
+    closeSidebar,
+    toggleSidebar
+} from './dom.js';
+import {
+    openSearchModal,
+    closeSearchModal,
+    initSearchModal
+} from '../modal/modal.js';
 import { clearSearchInput } from '../modal/dom.js';
 import { renderHistory } from '../history/history.js';
-import { clearSearchHistory, getSearchHistory, setActiveSearchHistory } from '../../../search/search.js';
+import {
+    clearSearchHistory,
+    getSearchHistory,
+    setActiveSearchHistory
+} from '../../../search/search.js';
 import type { Platform } from '../../../data/usrspace.js';
-import { getThemePreference, setThemePreference, type ThemePreference } from '../../theme.js';
+import {
+    getThemePreference,
+    setThemePreference,
+    type ThemePreference
+} from '../../theme.js';
 import {
     applyCompactSidebarPreference,
     getCompactSidebarPreference,
@@ -14,6 +29,7 @@ import {
     setDefaultPlatform,
     setRestoreSidebarPreference,
 } from '../../settings.js';
+import wait from "../../../../../api/wait.js";
 
 const isUrlPage = window.location.pathname.includes('url.html');
 const SIDEBAR_STATE_KEY = 'sidebarOpenState';
@@ -175,11 +191,11 @@ const initSidebar = (): void => {
     const closeSettingsModal = (): void => {
         settingsModal.classList.remove('is-visible');
         settingsModal.setAttribute('aria-hidden', 'true');
-        window.setTimeout(() => {
+        void wait(160).then(() => {
             if (settingsModal.getAttribute('aria-hidden') === 'true') {
                 settingsModal.classList.add('u-hidden');
             }
-        }, 160);
+        });
     };
 
     sidebarToggle.addEventListener('click', (event: MouseEvent) => {
@@ -203,9 +219,9 @@ const initSidebar = (): void => {
         setActiveSearchHistory(null);
         closeSidebar(sidebar);
         if (isUrlPage) {
-            window.setTimeout(() => {
+            void wait(220).then(() => {
                 window.location.href = 'index.html';
-            }, 220);
+            });
             return;
         }
         clearSearchInput(modalQueryInput);

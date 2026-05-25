@@ -16,6 +16,7 @@ import { getDefaultPlatform } from './impl/io/settings.js';
 import type { NormalizingEnv } from './types/window.js';
 import { Visualizer } from '../visualizer/visualizer.js';
 import { closeSidebar } from './impl/io/drawer/sidebar/dom.js';
+import wait from '../api/wait.js';
 
 interface SearchData {
     platform: Platform | null;
@@ -406,7 +407,7 @@ const handleCloseTab = (): void => {
     const sidebar = document.getElementById('history-sidebar') as HTMLElement | null;
     if (sidebar && !sidebar.classList.contains('u-hidden')) {
         closeSidebar(sidebar);
-        setTimeout(() => { window.location.href = 'index.html'; }, 220);
+        void wait(220).then(() => { window.location.href = 'index.html'; });
     } else {
         window.location.href = 'index.html';
     }

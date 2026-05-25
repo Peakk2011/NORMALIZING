@@ -1,6 +1,7 @@
 import { getActiveSearchHistoryKey, getSearchHistory } from '../../../search/search.js';
 import { createHistoryItem } from './item.js';
 import type { RefreshFn } from './types.js';
+import wait from '../../../../../api/wait.js';
 
 export interface HistoryMenuState {
     current: HTMLElement | null;
@@ -35,7 +36,10 @@ export const renderHistory = (
     history.slice(0, 12).forEach(record => {
         const item = createHistoryItem(
             record,
-            () => { sidebar.classList.remove('is-open'); setTimeout(() => sidebar.classList.add('u-hidden'), 220); },
+            () => {
+                sidebar.classList.remove('is-open');
+                void wait(220).then(() => sidebar.classList.add('u-hidden'));
+            },
             refresh,
             closeOpenMenu,
             menuState,

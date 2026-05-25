@@ -2,6 +2,7 @@
 
 import { focusModalInput, searchInPage } from './dom.js';
 import { Visualizer } from '../../../../../visualizer/visualizer.js';
+import wait from "../../../../../api/wait.js";
 
 export const openSearchModal = (modal: HTMLElement, modalQueryInput: HTMLTextAreaElement): void => {
     const pageInput = document.getElementById('query-input') as HTMLTextAreaElement | null;
@@ -28,11 +29,11 @@ export const closeSearchModal = (modal: HTMLElement): void => {
     }
     modal.setAttribute('aria-hidden', 'true');
     modal.classList.remove('is-visible');
-    window.setTimeout(() => {
+    void wait(180).then(() => {
         if (modal.getAttribute('aria-hidden') === 'true') {
             modal.classList.add('u-hidden');
         }
-    }, 180);
+    });
 };
 
 export const initSearchModal = (

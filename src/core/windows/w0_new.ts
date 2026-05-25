@@ -1,4 +1,5 @@
 import path from "node:path";
+import wait from '../../api/wait.js';
 
 import type {
     BrowserWindow as ElectronBrowserWindow,
@@ -132,11 +133,11 @@ export const createWindow = (url: string, width = 520, height = 615): ElectronBr
 
     // Open detached DevTools only in development
     if (isDev) {
-        setTimeout(() => {
+        void wait(500).then(() => {
             if (!win.isDestroyed()) {
                 win.webContents.openDevTools({ mode: "detach" });
             }
-        }, 500);
+        });
     }
 
     void win.loadURL(url);
