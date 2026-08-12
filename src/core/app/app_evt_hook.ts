@@ -155,10 +155,10 @@ const registerWebviewShortcut = (webContentsId: number): void => {
                     ? 'new-tab'
                     : 'toggle-settings';
 
-        const ownerWindow = BrowserWindow.fromWebContents(guest);
-        if (!ownerWindow || ownerWindow.isDestroyed()) return;
+        const hostWebContents = guest.hostWebContents;
+        if (!hostWebContents || hostWebContents.isDestroyed()) return;
 
-        ownerWindow.webContents.send('webview-shortcut', { action });
+        hostWebContents.send('webview-shortcut', { action });
         event.preventDefault();
     };
 
