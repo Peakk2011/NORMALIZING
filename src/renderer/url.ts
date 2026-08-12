@@ -12,6 +12,7 @@ import {
 import initSidebar from './impl/io/sidebar.js';
 import { mountSidebarParts } from './impl/io/sidebar_parts.js';
 import { initTheme } from './impl/io/theme.js';
+import { initI18n, translate } from './impl/io/i18n.js';
 import { getDefaultPlatform } from './impl/io/settings.js';
 import type { NormalizingEnv } from './types/window.js';
 import { Visualizer } from '../visualizer/visualizer.js';
@@ -115,6 +116,15 @@ const parseSearchData = (): SearchData | null => {
     return { platform: platformParam, query, url };
 };
 
+const isSafeWebviewUrl = (value: string): boolean => {
+    try {
+        const parsed = new URL(value);
+        return parsed.protocol === 'https:' || parsed.protocol === 'http:';
+    } catch {
+        return false;
+    }
+};
+
 const openUrl = (url: string): void => {
     if (window.electronAPI?.openExternal) {
         window.electronAPI.openExternal(url);
@@ -203,9 +213,12 @@ const initWebview = (webview: Electron.WebviewTag): void => {
     webview.addEventListener('new-window', (event: any) => {
         event.preventDefault();
         const newUrl: string | undefined = event.url;
-        if (newUrl && newUrl !== 'about:blank') {
-            window.electronAPI?.openUrlHtml('direct', newUrl);
+        if (!newUrl || newUrl === 'about:blank') return;
+        if (!isSafeWebviewUrl(newUrl)) {
+            openUrl(newUrl);
+            return;
         }
+        window.electronAPI?.openUrlHtml('direct', newUrl);
     });
 
     webview.addEventListener('context-menu', (event: any) => {
@@ -229,10 +242,8 @@ const initWebview = (webview: Electron.WebviewTag): void => {
 };
 
 const loadResult = (url: string): void => {
-    try {
-        new URL(url);
-    } catch {
-        void showUrlError(url, 'The address is invalid.');
+    if (!isSafeWebviewUrl(url)) {
+        void showUrlError(url, 'The address is invalid or cannot be displayed.');
         return;
     }
 
@@ -413,17 +424,46 @@ const handleCloseTab = (): void => {
     }
 };
 
+const openSearchOverlay = (): void => {
+    const searchBtn = document.getElementById('sidebar-search-btn') as HTMLButtonElement | null;
+    if (searchBtn) {
+        searchBtn.click();
+        return;
+    }
+    const modalQueryInput = document.getElementById('sidebar-modal-query-input') as HTMLTextAreaElement | null;
+    if (modalQueryInput) modalQueryInput.focus();
+};
+
+const toggleSettingsOverlay = (): void => {
+    const settingsModal = document.getElementById('settings-modal') as HTMLElement | null;
+    const settingsBtn = document.getElementById('sidebar-settings-btn') as HTMLButtonElement | null;
+    if (!settingsModal || !settingsBtn) return;
+
+    const isOpen = settingsModal.getAttribute('aria-hidden') === 'false';
+    if (isOpen) {
+        const settingsClose = document.getElementById('settings-modal-close') as HTMLButtonElement | null;
+        if (settingsClose) {
+            settingsClose.click();
+        }
+        return;
+    }
+
+    settingsBtn.click();
+};
+
 const handleWebviewShortcut = (action: string): void => {
     switch (action) {
         case 'close-tab':      handleCloseTab(); break;
         case 'new-tab':        window.location.href = 'index.html'; break;
-        case 'open-search':    break; // TODO: open in-page search UI
-        case 'toggle-settings': break; // TODO: toggle settings panel
+        case 'open-search':    openSearchOverlay(); break;
+        case 'toggle-settings': toggleSettingsOverlay(); break;
     }
 };
 
 document.addEventListener('DOMContentLoaded', () => {
     mountSidebarParts();
+    initI18n();
+    document.title = translate('url.pageTitle');
     initSidebar();
 
     currentData = parseSearchData();
@@ -442,4 +482,5 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.getElementById('back-btn')?.addEventListener('click', goBack);
+    document.getElementById('refresh-btn')?.addEventListener('click', refreshCurrentResult);
 });

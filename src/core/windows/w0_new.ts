@@ -7,7 +7,7 @@ import type {
     TitleBarOverlayOptions
 } from "electron";
 
-import { BrowserWindow, nativeImage, nativeTheme } from "electron";
+import { app, BrowserWindow, nativeImage, nativeTheme } from "electron";
 import { isDev, preloadPath } from "../config/env.js";
 
 // Resolve the correct icon format per platform
@@ -45,15 +45,59 @@ export const refreshOverlay = (): void => {
     BrowserWindow.getAllWindows().forEach(titlebarOverlayWin);
 };
 
+// Popup routing
+type PopupUrlOpener = (targetUrl: string) => void;
+
+let popupUrlOpener: PopupUrlOpener | null = null;
+
+export const setPopupUrlOpener = (opener: PopupUrlOpener): void => {
+    popupUrlOpener = opener;
+};
+
+const routePopupUrl = (targetUrl: string): void => {
+    if (!isHttpUrl(targetUrl)) return;
+
+    if (popupUrlOpener) {
+        popupUrlOpener(targetUrl);
+    } else {
+        console.warn("[popup] popupUrlOpener not set");
+        createWindow(targetUrl);
+    }
+};
+
+// (popup / target="_blank" / window.open() / <webview allowpopups>)
+let webviewPopupGuardInstalled = false;
+
+export const setupWebviewPopupGuard = (): void => {
+    if (webviewPopupGuardInstalled) return;
+    webviewPopupGuardInstalled = true;
+
+    app.on("web-contents-created", (_event, contents) => {
+        if (contents.getType() !== "webview") return;
+
+        contents.setWindowOpenHandler(({ url: targetUrl }) => {
+            routePopupUrl(targetUrl);
+            return { action: "deny" };
+        });
+
+        contents.on("will-navigate", (event, targetUrl) => {
+            if (!isHttpUrl(targetUrl)) {
+                event.preventDefault();
+            }
+        });
+    });
+};
+
 export const createWindow = (url: string, width = 520, height = 615): ElectronBrowserWindow => {
     const windowOptions: BrowserWindowConstructorOptions = {
         width,
         height,
-        show: true,
+        show: false,
+        frame: false,
         backgroundColor: "#00ffffff",
         titleBarStyle: "hidden",
         titleBarOverlay: getTitleBarOverlay(),
-        autoHideMenuBar: true,
+        autoHideMenuBar: false,
         // Set icon at window creation so it appears in taskbar, task manager, and dock
         icon: nativeImage.createFromPath(getIconPath()),
         webPreferences: {
@@ -74,6 +118,10 @@ export const createWindow = (url: string, width = 520, height = 615): ElectronBr
     win.setMenuBarVisibility(false);
     win.removeMenu();
 
+    win.once("ready-to-show", () => {
+        if (!win.isDestroyed()) win.show();
+    });
+
     const syncTitleBarOverlay = (): void => {
         if (!win.isDestroyed()) {
             win.setTitleBarOverlay(getTitleBarOverlay());
@@ -88,13 +136,17 @@ export const createWindow = (url: string, width = 520, height = 615): ElectronBr
         if (!isHttpUrl(targetUrl)) {
             return { action: "deny" };
         }
+
+        routePopupUrl(targetUrl);
         return {
-            action: "allow",
+            action: "deny",
             overrideBrowserWindowOptions: {
-                autoHideMenuBar: true,
+                frame: false,
+                autoHideMenuBar: false,
                 titleBarStyle: "hidden",
                 titleBarOverlay: getTitleBarOverlay(),
-                backgroundColor: "#00ffffff",
+                backgroundColor: "#ffffff",
+                show: false,
                 webPreferences: {
                     preload: preloadPath,
                     contextIsolation: true,

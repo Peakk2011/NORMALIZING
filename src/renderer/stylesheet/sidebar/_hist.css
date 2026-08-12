@@ -3,7 +3,7 @@
     font-size: 14px;
     letter-spacing: -0.2px;
     color: var(--theme-black);
-    font-family: 'Switzer';
+    font-family: 'Switzer', 'Anuphan', 'system-ui', 'leelawadee UI', sans-serif;
     font-weight: 550;
     user-select: none;
 }
@@ -186,7 +186,7 @@
     font-family: inherit;
     display: flex;
     align-items: center;
-    font-family: 'Switzer';
+    font-family: 'Switzer', 'Sarabun', 'system-ui', 'leelawadee UI', sans-serif;
     color: var(--theme-white);
     background: transparent;
     width: 100%;
@@ -214,7 +214,7 @@
 
 .c-history-empty {
     color: var(--theme-text-subtle);
-    font-family: 'Switzer';
+    font-family: 'Switzer', 'Sarabun', 'system-ui', 'leelawadee UI', sans-serif;
     font-size: 12.5px;
     padding: 4px 0px;
     background: transparent;

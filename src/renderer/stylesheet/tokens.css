@@ -87,6 +87,10 @@
     --scrollbar-thumb: rgba(0, 0, 0, 0.25);
     --scrollbar-thumb-hover: rgba(0, 0, 0, 0.35);
     --scrollbar-thumb-border: rgba(255, 255, 255, 0.5);
+
+    /* Typefaces */
+    --default-theme-normalizing-typeface: 'GeistMono', 'General Sans', 'Sarabun', 'system-ui', 'leelawadee UI', sans-serif;
+    --default-theme-normalizing-typeface-th-headings: 'General Sans', 'Anuphan', 'system-ui', 'leelawadee UI', sans-serif;
 }
 
 :root[data-theme="dark"] {

@@ -18,11 +18,17 @@
     "dev:vite": "vite",
     "dev": "concurrently -n TSC,VITE \"npm run watch:ts\" \"npm run dev:vite\"",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "npm run build && npx electron .",
-    "start:dev": "set VITE_DEV_SERVER_URL=http://127.0.0.1:5173&& npx electron .",
-    "normalizing": "concurrently -n TSC,VITE,ELECTRON \"npm run watch:ts\" \"npm run dev:vite\" \"wait-on http://127.0.0.1:5173 && set VITE_DEV_SERVER_URL=http://127.0.0.1:5173&& npx electron .\"",
+
+    "start": "npm run build && npx electron . --ozone-platform=x11",
+    "start:dev:win": "set VITE_DEV_SERVER_URL=http://127.0.0.1:5173&& npx electron . --ozone-platform=x11",
+    "start:dev:linux": "export VITE_DEV_SERVER_URL=http://127.0.0.1:5173 && npx electron . --ozone-platform=x11",
+
+    "normalizing:win": "concurrently -n TSC,VITE,ELECTRON \"npm run watch:ts\" \"npm run dev:vite\" \"wait-on http://127.0.0.1:5173 && set VITE_DEV_SERVER_URL=http://127.0.0.1:5173&& npx electron . --ozone-platform=x11\"",
+    "normalizing:linux": "concurrently -n TSC,VITE,ELECTRON \"npm run watch:ts\" \"npm run dev:vite\" \"wait-on http://127.0.0.1:5173 && export VITE_DEV_SERVER_URL=http://127.0.0.1:5173 && npx electron . --ozone-platform=x11\"",
+
     "dist:win": "npm run build && electron-builder --win --publish=never",
-    "dist:mac": "npm run build && electron-builder --mac"
+    "dist:mac": "npm run build && electron-builder --mac",
+    "dist:linux": "npm run build && electron-builder --linux --publish=never"
   },
   "keywords": [],
   "author": "",

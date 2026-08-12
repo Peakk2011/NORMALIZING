@@ -32,7 +32,7 @@
     font-weight: 550;
     letter-spacing: -0.4px;
     color: var(--theme-black);
-    font-family: 'General Sans', 'Sarabun', 'system-ui', 'leelawadee UI', sans-serif;
+    font-family: 'General Sans', 'Anuphan', 'system-ui', 'leelawadee UI', sans-serif;
     text-align: center;
     align-content: center;
     height: 38px;
@@ -100,7 +100,7 @@
 .c-settings-menu-btn {
     border: 1px solid transparent;
     background: transparent;
-    font-family: 'General Sans', 'Sarabun', 'system-ui', 'leelawadee UI', sans-serif;
+    font-family: 'General Sans', 'Anuphan', 'system-ui', 'leelawadee UI', sans-serif;
     font-weight: 500;
     letter-spacing: -0.2px;
     color: var(--theme-black);
@@ -203,6 +203,7 @@
     margin: 6px 0 12px;
     letter-spacing: -0.3px;
     text-transform: uppercase;
+    font-family: 'GeistMono', var(--default-theme-normalizing-typeface-th-headings);
 }
 
 .c-settings-copy p {
@@ -210,7 +211,6 @@
     color: var(--theme-text-muted);
     font-size: 12.5px;
     line-height: 1.45;
-    letter-spacing: -0.1px;
     font-family: 'Switzer', 'Sarabun', 'system-ui', 'leelawadee UI', sans-serif;
 }
 

@@ -2,6 +2,7 @@ import { getActiveSearchHistoryKey, getSearchHistory } from '../../../search/sea
 import { createHistoryItem } from './item.js';
 import type { RefreshFn } from './types.js';
 import wait from '../../../../../api/wait.js';
+import { translate } from '../../i18n.js';
 
 export interface HistoryMenuState {
     current: HTMLElement | null;
@@ -28,7 +29,7 @@ export const renderHistory = (
     if (history.length === 0) {
         const empty = document.createElement('div');
         empty.className = 'c-history-empty';
-        empty.textContent = 'No recent searches yet.';
+        empty.textContent = translate('history.empty');
         historyList.appendChild(empty);
         return;
     }

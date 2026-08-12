@@ -1,6 +1,12 @@
 import type { BrowserWindow } from "electron";
 import { rendererUrl } from "../config/env.js";
-import { createWindow, refreshOverlay as refreshOverlayImpl } from "./w0_new.js";
+
+import {
+    createWindow,
+    refreshOverlay as refreshOverlayImpl,
+    setPopupUrlOpener,
+    setupWebviewPopupGuard as setupWebviewPopupGuardImpl
+} from "./w0_new.js";
 
 const MAX_WINDOWS = 3;
 
@@ -27,8 +33,18 @@ export const openUrlWindow = (platform: string, query: string): void => {
         }
     }
 
-    const urlHtmlUrl = `${rendererUrl.replace("index.html", "url.html")}?platform=${encodeURIComponent(platform)}&query=${encodeURIComponent(query)}`;
-    const newWin = createWindow(urlHtmlUrl, 520, 615);
+        const windowBounds = mainWindow && !mainWindow.isDestroyed()
+        ? mainWindow.getBounds()
+        : { width: 520, height: 615 };
+
+    const targetUrl = new URL("url.html", rendererUrl);
+    if (platform === 'direct') {
+        targetUrl.searchParams.set("target", query);
+    } else {
+        targetUrl.searchParams.set("platform", platform);
+        targetUrl.searchParams.set("query", query);
+    }
+    const newWin = createWindow(targetUrl.toString(), windowBounds.width, windowBounds.height);
 
     newWin.on("closed", () => {
         urlViewWindows.delete(windowKey);
@@ -38,15 +54,10 @@ export const openUrlWindow = (platform: string, query: string): void => {
 };
 
 export const openDirectUrlWindow = (url: string): void => {
-    const newWin = createWindow(url, 520, 615);
-    newWin.on("closed", () => {
-        for (const [key, value] of urlViewWindows.entries()) {
-            if (value === newWin) {
-                urlViewWindows.delete(key);
-            }
-        }
-    });
+    openUrlWindow('direct', url);
 };
+
+setPopupUrlOpener(openDirectUrlWindow);
 
 export const createMainWindow = (): BrowserWindow => {
     const win = createWindow(rendererUrl, 520, 615);
@@ -62,30 +73,8 @@ export const getMainWindow = (): BrowserWindow | null => mainWindow;
 
 export const refreshOverlay = refreshOverlayImpl;
 
+export const setupWebviewPopupGuard = setupWebviewPopupGuardImpl;
+
 export const clearWindowState = (): void => {
     urlViewWindows.clear();
 };
-
-/*
-BUG KNOWN:
-FROM 'GOOGLE GEMINI'
-
-[ Webview / Guest ]                 [ Renderer Process ]                 [ Main Process ]
-         |                                   |                                   |
-   (1) Mounts & Loads                        |                                   |
-         |                                   |                                   |
-   (2) Fires "dom-ready"                     |                                   |
-         | --------------------------------------------------------------------> | (No listener active yet!)
-         |                                   |                                   |   [ Event is lost ]
-         |                                   |                                   |
-         |                             (3) Calls:                                |
-         |                                 registerWebviewShortcut               |
-         |                                   | --------------------------------> |
-         |                                   |                                   | (4) Tries to bind:
-         |                                   |                                   |     guest.on("dom-ready")
-         |                                   |                                   |   [ Too late... ]
-         |                                   |                                   |
-         v                                   v                                   v
- ───────────────────────────────────────────────────────────────────────────────────────────
-                                [ Result: tryInject is never called ]
-*/

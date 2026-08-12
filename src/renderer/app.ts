@@ -8,11 +8,13 @@ import initSidebar from './impl/io/sidebar.js';
 import initSubstrate from './impl/hijack/substrate.js';
 import { mountSidebarParts } from './impl/io/sidebar_parts.js';
 import { initTheme } from './impl/io/theme.js';
+import { initI18n, translate } from './impl/io/i18n.js';
 import type { NormalizingEnv } from './types/window.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log('app.ts loaded, electronAPI:', window.electronAPI);
     mountSidebarParts();
+    initI18n();
 
     // Inject platform classes
     const root = document.documentElement;
@@ -58,6 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
     root.classList.add(env.isDev ? "env-dev" : "env-prod");
     root.classList.add("page-index");
     initTheme();
+    document.title = translate('document.title');
 
     console.log('window.env:', window.env);
 

@@ -49,9 +49,10 @@
     color: inherit;
     font-size: 14px;
     font-weight: 550;
-    letter-spacing: -0.2px;
+    letter-spacing: -0.3px;
     user-select: none;
     margin: 0;
+    font-family: var(--default-theme-normalizing-typeface-th-headings);
 }
 
 .c-sidebar-action-secondary {

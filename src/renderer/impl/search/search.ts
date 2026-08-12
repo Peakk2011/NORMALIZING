@@ -3,6 +3,7 @@
 import type { Platform } from '../data/usrspace.js';
 import mkReqUrl from './mk_req_url.js';
 import { Visualizer } from '../../../visualizer/visualizer.js';
+import { translate } from '../io/i18n.js';
 import type { NormalizingEnv } from '../../types/window.js';
 
 export type HistoryPlatform = Platform | 'direct';
@@ -263,7 +264,7 @@ const search = (platform: Platform, queryOverride?: string): void => {
     const input = getQueryInput();
     const query = (queryOverride?.trim() ?? input?.value?.trim() ?? '').trim();
     if (!query) {
-        void Visualizer({ title: 'Type your message and select your platform.' });
+        void Visualizer({ title: translate('search.inputRequired') });
         return;
     }
 

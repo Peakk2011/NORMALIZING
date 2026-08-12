@@ -19,7 +19,8 @@ import {
     getMainWindow,
     openDirectUrlWindow,
     openUrlWindow,
-    refreshOverlay
+    refreshOverlay,
+    setupWebviewPopupGuard
 } from "../windows/w0.js";
 
 const HISTORY_FILE_PATH = path.join(app.getPath("userData"), "search-history.json");
@@ -81,15 +82,31 @@ const SHORTCUT_INJECT_SCRIPT = `
 (function() {
     if (window.__normalizingShortcutInjected) return;
     window.__normalizingShortcutInjected = true;
-    const ACTION_MAP = { f: 'open-search', w: 'close-tab', t: 'new-tab' };
+    const ACTION_MAP = { f: 'open-search', w: 'close-tab', t: 'new-tab', r: 'toggle-settings' };
     window.addEventListener('keydown', function(e) {
         if ((!e.ctrlKey && !e.metaKey) || e.altKey) return;
         const key    = e.key.toLowerCase();
-        const action = (key === '+' || key === '=') ? 'toggle-settings' : ACTION_MAP[key];
+        const action = (key === '+' || key === '=' || key === ',') ? 'toggle-settings' : ACTION_MAP[key];
         if (!action) return;
         e.preventDefault();
         e.stopPropagation();
         window.postMessage({ __normalizing: true, action }, '*');
+    }, true);
+
+    window.addEventListener('click', function(e) {
+        if (e.defaultPrevented || e.button !== 0) return;
+        if (!e.ctrlKey && !e.metaKey) return;
+        if (e.altKey || e.shiftKey) return;
+
+        let target = e.target;
+        while (target && target.nodeName !== 'A') {
+            target = target.parentElement;
+        }
+        if (!target || !target.href) return;
+
+        e.preventDefault();
+        e.stopPropagation();
+        window.open(target.href, '_blank');
     }, true);
 })();
 `;
@@ -118,19 +135,49 @@ const registerWebviewShortcut = (webContentsId: number): void => {
             .catch((err) => console.error("[shortcut] inject FAILED id:", webContentsId, err));
     };
 
+    const handleShortcutInput = (event: Electron.Event, input: Electron.Input): void => {
+        if (input.type !== 'keyDown') return;
+        if (!input.control && !input.meta) return;
+        if (input.alt) return;
+
+        const key = String(input.key ?? '').toLowerCase();
+        const isFindShortcut = key === 'f';
+        const isCloseShortcut = key === 'w';
+        const isNewTabShortcut = key === 't';
+        const isToggleSettingsShortcut = key === ',' || key === 'r' || key === '+' || key === '=';
+        if (!isFindShortcut && !isCloseShortcut && !isNewTabShortcut && !isToggleSettingsShortcut) return;
+
+        const action = isFindShortcut
+            ? 'open-search'
+            : isCloseShortcut
+                ? 'close-tab'
+                : isNewTabShortcut
+                    ? 'new-tab'
+                    : 'toggle-settings';
+
+        const ownerWindow = BrowserWindow.fromWebContents(guest);
+        if (!ownerWindow || ownerWindow.isDestroyed()) return;
+
+        ownerWindow.webContents.send('webview-shortcut', { action });
+        event.preventDefault();
+    };
+
     tryInject();
 
-    guest.on("dom-ready",            tryInject);
-    guest.on("did-navigate",         tryInject);
-    guest.on("did-navigate-in-page", tryInject);
+    guest.on('dom-ready', tryInject);
+    guest.on('did-navigate', tryInject);
+    guest.on('did-navigate-in-page', tryInject);
+    guest.on('before-input-event', handleShortcutInput);
 
-    guest.once("destroyed", () => {
+    guest.once('destroyed', () => {
         webviewShortcutGuard.delete(webContentsId);
+        guest.removeListener('before-input-event', handleShortcutInput);
     });
 };
 
 export const registerApplicationEvents = (): void => {
     ipcMain.on("open-url-html", (_event, data: { platform: string; query: string }) => {
+        if (!isSafeExternalUrl(data.query)) return;
         openUrlWindow(data.platform, data.query);
     });
 
@@ -235,6 +282,7 @@ export const registerApplicationEvents = (): void => {
 
     app.whenReady().then(() => {
         setupSessionHandlers(session.defaultSession);
+        setupWebviewPopupGuard();
         void logGpuStatus();
         const win = createMainWindow();
 
@@ -246,7 +294,7 @@ export const registerApplicationEvents = (): void => {
             const isFindShortcut = isCtrlOrMeta && !input.alt && key === "f";
             const isCloseShortcut = isCtrlOrMeta && !input.alt && key === "w";
             const isNewTabShortcut = isCtrlOrMeta && !input.alt && key === "t";
-            const isToggleSettingsShortcut = isCtrlOrMeta && !input.alt && (key === "+" || key === "=");
+            const isToggleSettingsShortcut = isCtrlOrMeta && !input.alt && (key === "+" || key === "=" || key === ",");
 
             if (isFindShortcut || isCloseShortcut || isNewTabShortcut || isToggleSettingsShortcut) {
                 console.log(`[Main Window Shortcut] Action: ${isFindShortcut ? 'open-search' : isCloseShortcut ? 'close-tab' : isNewTabShortcut ? 'new-tab' : 'toggle-settings'}`);

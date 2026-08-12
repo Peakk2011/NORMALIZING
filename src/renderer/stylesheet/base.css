@@ -16,7 +16,7 @@
 
 html,
 body {
-    font-family: 'GeistMono', 'General Sans', 'Sarabun', 'system-ui', 'leelawadee UI', sans-serif;
+    font-family: var(--default-theme-normalizing-typeface);
     background-color: var(--theme-bg);
 }
 

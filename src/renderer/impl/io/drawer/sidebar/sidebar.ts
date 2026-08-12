@@ -29,6 +29,12 @@ import {
     setDefaultPlatform,
     setRestoreSidebarPreference,
 } from '../../settings.js';
+import {
+    getLanguagePreference,
+    setLanguagePreference,
+    translate,
+    type Locale
+} from '../../i18n.js';
 import wait from "../../../../../api/wait.js";
 
 const isUrlPage = window.location.pathname.includes('url.html');
@@ -126,6 +132,7 @@ const initSidebar = (): void => {
     const settingsPanels = Array.from(settingsModal.querySelectorAll<HTMLElement>('[data-settings-panel]'));
     const themeButtons = Array.from(settingsModal.querySelectorAll<HTMLButtonElement>('[data-theme-choice]'));
     const defaultPlatformButtons = Array.from(settingsModal.querySelectorAll<HTMLButtonElement>('[data-default-platform]'));
+    const languageButtons = Array.from(settingsModal.querySelectorAll<HTMLButtonElement>('[data-language]'));
 
     const menuState = { current: null as HTMLElement | null };
     let activeSettingsTab = 'general';
@@ -142,7 +149,12 @@ const initSidebar = (): void => {
         const history = getSearchHistory();
         const pinnedCount = history.filter(item => item.pinned).length;
         const recentCount = history.length - pinnedCount;
-        historySummary.textContent = `${recentCount} recent item${recentCount === 1 ? '' : 's'} and ${pinnedCount} pinned item${pinnedCount === 1 ? '' : 's'}.`;
+        historySummary.textContent = translate('history.summary', {
+            recentCount,
+            recentPlural: recentCount === 1 ? '' : 's',
+            pinnedCount,
+            pinnedPlural: pinnedCount === 1 ? '' : 's',
+        });
     };
     const setActiveSettingsTab = (tab: string): void => {
         const currentIndex = settingsTabs.findIndex(btn => btn.dataset.settingsTab === activeSettingsTab);
@@ -174,11 +186,18 @@ const initSidebar = (): void => {
             btn.classList.toggle('is-active', btn.dataset.defaultPlatform === nextDefault);
         });
     };
+    const syncLanguageSelection = (): void => {
+        const nextLanguage = getLanguagePreference();
+        languageButtons.forEach((btn) => {
+            btn.classList.toggle('is-active', btn.dataset.language === nextLanguage);
+        });
+    };
     const syncSettingsState = (): void => {
         restoreSidebarToggle.checked = getRestoreSidebarPreference();
         compactSidebarToggle.checked = getCompactSidebarPreference();
         syncThemeSelection();
         syncDefaultPlatformSelection();
+        syncLanguageSelection();
         syncHistorySummary();
     };
     const openSettingsModal = (): void => {
@@ -254,6 +273,13 @@ const initSidebar = (): void => {
             const next = (btn.dataset.defaultPlatform ?? 'google') as Platform;
             setDefaultPlatform(next);
             syncDefaultPlatformSelection();
+        });
+    });
+    languageButtons.forEach((btn) => {
+        btn.addEventListener('click', () => {
+            const next = (btn.dataset.language ?? 'en') as Locale;
+            setLanguagePreference(next);
+            syncLanguageSelection();
         });
     });
     restoreSidebarToggle.addEventListener('change', () => {
