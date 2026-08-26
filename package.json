@@ -28,10 +28,11 @@
 
     "dist:win": "npm run build && electron-builder --win --publish=never",
     "dist:mac": "npm run build && electron-builder --mac",
-    "dist:linux": "npm run build && electron-builder --linux --publish=never"
+    "dist:linux": "npm run build && electron-builder --linux --publish=never",
+    "dist:linux-deb": "npm run build && electron-builder --linux deb --publish=never"
   },
   "keywords": [],
-  "author": "",
+  "author": "peakk <peakk3984@gmail.com>",
   "license": "ISC",
   "type": "module",
   "devDependencies": {
