@@ -2,8 +2,7 @@
   <img src="https://mint-teams.web.app/Assets/NormalizingIcons.png" height="92.5px" width="92.5px"></img>
 </p>
 
-<h1 align='center'>Normalizing - Internet Index</h1> 
-<br>
+<h1 align='center'>Normalizing</h1> 
 
 <p align='center'>Type once. Pick a platform.</p>
 
